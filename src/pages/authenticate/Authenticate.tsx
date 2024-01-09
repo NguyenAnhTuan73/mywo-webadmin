@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, message, Spin } from 'antd';
-import {
-	LockOutlined,
-	UserOutlined,
-	EyeTwoTone,
-	EyeInvisibleOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, UserOutlined, EyeTwoTone, EyeInvisibleOutlined } from '@ant-design/icons';
 import { errorAuth } from '../../enum/auth/auth.error';
 import { userLoginAdmin } from '../../service/auth/AuthService';
-import { useDispatch, } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { userAction } from '../../reducer/userReducer';
 import { useNavigate } from 'react-router-dom';
 import { setAccessToken, setRefreshToken, setUserAndPasswordLocal } from '../../helper/tokenHelper';
@@ -21,7 +16,9 @@ import './Authenticate.scss';
 export default function Authenticate() {
 	const dispatch = useDispatch();
 	const [isSpin, setIsSpin] = useState(false);
+	const [statusButtonAuthen, setStausButtonAuthen] = useState(true);
 	const navigate = useNavigate();
+	const [formAuthenticate] = Form.useForm();
 
 	const onFinish = (values: AuthInterface) => {
 		setIsSpin(true);
@@ -44,11 +41,24 @@ export default function Authenticate() {
 	const onFinishFailed = (errorInfo: any) => {
 		console.log('Failed:', errorInfo);
 	};
+	const handleOnChange = (e: any) => {
+		const value = formAuthenticate.getFieldsValue();
+		const check = formatEmail.test(value.email);
+
+		if (value.email === '' || value.password === '' || value.password?.length < 6) {
+			setStausButtonAuthen(true);
+		} else {
+			setStausButtonAuthen(false);
+		}
+		if (!formatEmail.test(value.email)) {
+			setStausButtonAuthen(true);
+		}
+	};
 
 	return (
 		<Spin size="small" spinning={isSpin} delay={1000}>
 			<div className="w-full h-[100vh] bg_auth flex items-center">
-				<div className="w-[30rem] min-w-[300px] mx-auto rounded-[10px] p-3">
+				<div className="w-[30rem]  mx-auto rounded-xl shadow-lg ">
 					<Form
 						name="basic"
 						labelCol={{ span: 32 }}
@@ -60,10 +70,11 @@ export default function Authenticate() {
 						layout="vertical"
 						size="large"
 						className="items-center w-full h-full bg-white rounded my-auto shadow-md"
+						form={formAuthenticate}
 					>
 						<div className="px-5 py-10">
 							<div className="w-full mb-5 ">
-								<img className=" mx-auto block" src={images.logo} alt="" />
+								<img className=" mx-auto block h-10" src={images.logo} alt="" />
 							</div>
 							<Form.Item
 								name="email"
@@ -71,8 +82,10 @@ export default function Authenticate() {
 									{
 										validator(rule, val) {
 											if (val === undefined || val === null || val === '') {
+												setStausButtonAuthen(true);
 												return Promise.reject(new Error(errorAuth.EMAIL_NONE));
 											} else if (!formatEmail.test(val)) {
+												setStausButtonAuthen(true);
 												return Promise.reject(new Error(errorAuth.EMAIL_FORMAT));
 											} else {
 												return Promise.resolve();
@@ -84,6 +97,7 @@ export default function Authenticate() {
 								<Input
 									prefix={<UserOutlined className="mr-2" />}
 									placeholder="Please enter your email"
+									onChange={e => handleOnChange(e)}
 								/>
 							</Form.Item>
 
@@ -93,8 +107,10 @@ export default function Authenticate() {
 									{
 										validator(rule, val) {
 											if (val === undefined || val === null || val === '') {
+												setStausButtonAuthen(true);
 												return Promise.reject(new Error(errorAuth.PASSWORD_NONE));
 											} else if (val.length < 6) {
+												setStausButtonAuthen(true);
 												return Promise.reject(new Error(errorAuth.PASSWORD_LENGTH));
 											} else {
 												return Promise.resolve();
@@ -108,6 +124,7 @@ export default function Authenticate() {
 									prefix={<LockOutlined className="mr-2" />}
 									placeholder="Please enter your password"
 									iconRender={visible => (visible ? <EyeInvisibleOutlined /> : <EyeTwoTone />)}
+									onChange={e => handleOnChange(e)}
 								/>
 							</Form.Item>
 							{/* <p
@@ -129,9 +146,15 @@ export default function Authenticate() {
 									SIGN UP
 								</p>
 							</div> */}
-							<Form.Item wrapperCol={{ offset: 32, span: 32 }} className="w-full">
-								<Button type="primary" htmlType="submit" danger className="w-full rounded-md">
-									Submit
+							<Form.Item wrapperCol={{ offset: 32, span: 32 }} className="w-full ">
+								<Button
+									disabled={statusButtonAuthen}
+									type="text"
+									htmlType="submit"
+									style={{ backgroundColor: '#3DCFE3' }}
+									className="w-full rounded-md border-[#3DCFE3] mt-5 "
+								>
+									<span className="text-white">Submit</span>
 								</Button>
 							</Form.Item>
 						</div>

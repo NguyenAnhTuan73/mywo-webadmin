@@ -3,7 +3,7 @@
 .main {
 	padding-left: $sideBarWidth;
 	overflow-x: hidden;
-	background-color: rgba(0, 0, 0, 0.05);
+	// background-color: rgba(0, 0, 0, 0.05);
 
 	@include tablet {
 		padding-left: 0;
@@ -15,6 +15,8 @@
 		min-height: 100vh;
 		padding: $spacing-tb;
 		transition: all 0.5s ease-in-out;
+		background-image: url('../assets/images/background.svg');
+		background-repeat: no-repeat;
 
 		@include tablet {
 			padding: 10px;

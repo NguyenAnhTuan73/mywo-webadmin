@@ -20,15 +20,12 @@ export interface DataType {
 	deposit_amount: string;
 	amount: string;
 	start_amount: string;
+	type: string;
 }
 
 export interface TypeObjParams {
-	search: string;
 	page: number;
 	size: number;
-	status?: string;
-	current_plan?: string;
-	app_version?: string;
 }
 
 export interface TypeSelect {

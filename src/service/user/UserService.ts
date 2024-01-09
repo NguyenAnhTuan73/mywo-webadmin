@@ -20,7 +20,7 @@ export const updateVnpStatus = async (objParamsId: any) => {
 export const getListUser = async (params: TypeObjParams) => {
 	// console.log(params);
 	let objParamUrls = qs.stringify(params);
-	return await apiClient.get(`/admin/users?${objParamUrls}`);
+	return await apiClient.get(`/admin/getUsers?${objParamUrls}`);
 };
 export const getListUserSendEmail = async (params: TypeObjParams, data: any) => {
 	// console.log(params);
@@ -37,9 +37,9 @@ export const getSelectToFilter = async (params: string[]) => {
 	return await apiClient.get(`/admin/getDistinctFieldDevices?${myArrayQry}`);
 };
 
-export const getListFamily = async (params: TypeObjParams) => {
+export const getListGroups = async (params: TypeObjParams) => {
 	let objParamUrls = qs.stringify(params);
-	return await apiClient.get(`/admin/families?${objParamUrls}`);
+	return await apiClient.get(`/admin/getGroups?${objParamUrls}`);
 };
 
 export const getListDevice = async (params: TypeObjParams) => {

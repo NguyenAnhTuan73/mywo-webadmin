@@ -12,10 +12,12 @@ import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { dataActive, dataPlan, dataType, dataPoint, dataVerified } from './dataOptionActive';
-import PopupAdd from '../popup-add/PopupAdd';
-import PopupSend from '../popup-send/PopupSend';
+
 const { Option } = Select;
 import './ListUser.scss';
+import { LoadingOutlined } from '@ant-design/icons';
+import { getAccessToken } from '../../helper/tokenHelper';
+import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -182,15 +184,13 @@ export default function ListUser() {
 		});
 	};
 
-	// useEffect(() => {
-	// 	// getDataListUser(objParams);
-	// }, [getAccessToken()]);
 	// click show modal add point
 	const getDataListUser = async (objData: any) => {
 		try {
 			setIsSpin(true);
 			setObjParams(objData);
 			const res = await getListUser(objData);
+
 			setIsSpin(false);
 
 			setBlockDataUser({
@@ -213,38 +213,9 @@ export default function ListUser() {
 			setIsSpin(false);
 		}
 	};
-
-	const handleChangeSendUser = (idUser: any, check: boolean) => {
-		if (check) {
-			arrayIdUser.push(idUser);
-		} else {
-			const indexIdUser = arrayIdUser.indexOf(idUser);
-			arrayIdUser.splice(indexIdUser, 1);
-		}
-		setArrayIdUser([...arrayIdUser]);
-	};
-
-	const onCheckAllChange = (e: CheckboxChangeEvent) => {
-		let arrayToPush: any[] = [];
-		let tempUser: any = blockDataUser.dataUser.map((user: any, index: any) => {
-			if (e.target.checked) {
-				arrayToPush.push(user['_id']);
-				setDisbledCheckBoxUser(true);
-				return {
-					...user,
-					send: true,
-				};
-			} else {
-				setDisbledCheckBoxUser(false);
-				return {
-					...user,
-					send: false,
-				};
-			}
-		});
-		setArrayIdUser([...arrayToPush]);
-		setBlockDataUser({ ...blockDataUser, dataUser: tempUser });
-	};
+	useEffect(() => {
+		getDataListUser(objParams);
+	}, [getAccessToken()]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -360,46 +331,27 @@ export default function ListUser() {
 				return <div>{`${current_plan} ( ${moment(item.plan_expired_time).format('DD-MM-YYYY')} )`}</div>;
 			},
 		},
+
 		{
-			title: 'POINTS',
-			key: 'points',
-			dataIndex: 'points',
-			width: '7%',
-			render: (view_points, item) => {
-				return <div>{item.points ? item.points?.total_points : 0}</div>;
-			},
-		},
-		{
-			title: 'ADD POINTS',
-			key: 'add_points',
-			dataIndex: 'add_points',
+			title: 'GROUP USERS',
+			key: 'group_users',
+			dataIndex: 'group_users',
 			className: 'text-center ',
 			width: '9%',
 			render: (points, item) => {
 				return (
 					<>
-						<Button type="primary" size="small" onClick={() => showModal(item)}>
-							+
+						<Button
+							style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}
+							type="primary"
+							size="middle"
+							onClick={() => showModal(item)}
+						>
+							View
 						</Button>
 					</>
 				);
 			},
-		},
-		{
-			title: 'EMAIL',
-			dataIndex: 'email_verified',
-			key: 'email_verified',
-			width: '5%',
-			render: (email_verified, item) => (
-				<Space size="middle">
-					<Switch
-						checked={email_verified === true}
-						onChange={() => {
-							handleSwitchEmailVerified(item['_id'], !email_verified);
-						}}
-					/>
-				</Space>
-			),
 		},
 	];
 	// Filter plan in list user
@@ -520,7 +472,7 @@ export default function ListUser() {
 								onChange={e => handleChange(e)}
 								onKeyDown={handleEnterSearch}
 							/>
-							<Button type="primary">
+							<Button type="primary" style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}>
 								<div className="flex items-center" onClick={handleClickSearch}>
 									<i className="bx bx-search text-base mr-1"></i>
 									<span>Search</span>
@@ -528,7 +480,7 @@ export default function ListUser() {
 							</Button>
 						</div>
 						<div className="flex xl:flex-col md:items-start  items-center xl:justify-start xl:w-full">
-							<div className="flex md:flex-col w-full justify-between">
+							{/* <div className="flex md:flex-col w-full justify-between">
 								<div className="mr-1 xl:w-1/3 md:w-full md:mb-2 ">
 									<Select
 										className="xl:w-full w-[9rem]   sm:mb-4  mr-2"
@@ -666,9 +618,9 @@ export default function ListUser() {
 										})}
 									</Select>
 								</div>
-							</div>
+							</div> */}
 							<div className="flex items-center xl:w-full xl:justify-start ">
-								<div className="">
+								{/* <div className="">
 									<Button
 										type="primary"
 										className="w-50 sm:w-full  my-[0.5rem] "
@@ -679,7 +631,7 @@ export default function ListUser() {
 									>
 										Send Message To User
 									</Button>
-								</div>
+								</div> */}
 								<div className="w-32 ml-1 md:w-30 sm:w-full">
 									<p className="mb-0 sm:my-4 sm:float-left w-full inline-block  font-semibold">
 										Total : {blockDataUser?.lengthUser}
@@ -692,7 +644,9 @@ export default function ListUser() {
 				<div className=" overflow-hidden ">
 					{isSpin ? (
 						<div className="w-full h-full flex justify-center items-center">
-							<Spin size="large" spinning={isSpin} />
+							<Spin
+								indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />}
+							/>
 						</div>
 					) : (
 						<Table
@@ -729,54 +683,13 @@ export default function ListUser() {
 					/>
 				</div>
 			</div>
-			<PopupAdd
-				ModalVisibleAdd={isModalVisibleAdd}
-				handleCancelAdd={handleCancelAdd}
-				handleOKAdd={handleOKAdd}
-				statusActiveUser={statusActiveUser}
+
+			<PopupGroupUsers
+				currentUser={currentUser}
+				handleOk={handleOk}
+				handleCancel={handleCancel}
+				isModalOpen={isModalOpen}
 			/>
-
-			<PopupAdd
-				ModalVisibleAdd={isModalVisibleVerified}
-				handleCancelAdd={handleCancelAdd}
-				handleOKAdd={handleOKChangeEmailVerified}
-				statusActiveUser={statusActiveEmail}
-			/>
-
-			<PopupSend
-				isModalVisibleSend={isModalVisibleSend}
-				handleCancelSend={handleCancelSend}
-				handleOKSend={handleOKSend}
-				arrayIdUser={arrayIdUser}
-			/>
-
-			<Modal
-				title={
-					<div>
-						Add points to:{' '}
-						<span className="text-red-600">
-							{currentUser?.first_name} {currentUser?.last_name}
-						</span>
-					</div>
-				}
-				destroyOnClose={true}
-				visible={isModalOpen}
-				onOk={handleOk}
-				onCancel={handleCancel}
-				className="p-2 rounded-sm"
-			>
-				<Input
-					type="number"
-					placeholder="Add points"
-					onKeyDown={blockInvalidChar}
-					onChange={e => {
-						setAddPoint(e.target.value.replace(/^\d*\D/g, '').replace(/^0/, ''));
-					}}
-					value={addPoint}
-				/>
-
-				<p className="mt-4 mb-0 text-md italic text-red-600">*Are you sure to add points for this user?</p>
-			</Modal>
 		</>
 	);
 }

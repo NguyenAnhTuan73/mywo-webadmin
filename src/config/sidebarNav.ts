@@ -12,46 +12,16 @@ const sidebarNav = [
 		text: 'USERS LIST',
 	},
 	{
-		link: '/family-list',
-		section: 'family-list',
+		link: '/group-list',
+		section: 'group-list',
 		icon: 'bx bx-receipt',
-		text: 'FAMILY LIST',
+		text: 'GROUP LIST',
 	},
 	{
 		link: '/devices-list',
 		section: 'devices-list',
 		icon: 'bx bx-cube',
 		text: 'DEVICES LIST ',
-	},
-	{
-		link: '/tutorials',
-		section: 'tutorials',
-		icon: 'bx bx-book-content',
-		text: 'TUTORIAL LIST',
-	},
-	{
-		link: '/point-list',
-		section: 'point-list',
-		icon: 'bx bx-wallet-alt',
-		text: 'POINT LIST',
-	},
-	{
-		link: '/send-email',
-		section: 'send-email',
-		icon: 'bx bx-envelope',
-		text: 'SEND EMAIL',
-	},
-	{
-		link: '/group-sale',
-		section: 'group-sale',
-		icon: 'bx bx-group',
-		text: 'GROUP SALE',
-	},
-	{
-		link: '/error-log',
-		section: 'error-log',
-		icon: 'bx bx-error',
-		text: 'ERROR LOG',
 	},
 
 	// {

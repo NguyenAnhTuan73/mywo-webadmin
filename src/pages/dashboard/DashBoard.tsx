@@ -1,49 +1,48 @@
 import React, { useState, useEffect } from 'react';
+
 import moment from 'moment';
 import { Spin, Space, Switch, message } from 'antd';
-import {
-	UserOutlined,
-	HomeOutlined,
-	TeamOutlined,
-} from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
 import { getDashboard, getVnpStatus, updateVnpStatus } from '../../service/user/UserService';
 import { Column } from '@ant-design/plots';
 import './DashBoard.scss';
 import { TypeData } from '../../interface/manage.interface';
 import { getAccessToken } from '../../helper/tokenHelper';
+import { colors } from '../../constant';
 
 export default function DashBoard() {
 	const [dashboarDisplay, setDashboarDisplay] = useState<TypeData>({
-		numFamily: 0,
+		numGroup: 0,
 		numUser: 0,
 		userOfDate: {},
 	});
 
-	const [ vnpStatus, setVnpStatus] =  useState(false);
+	const [vnpStatus, setVnpStatus] = useState(false);
 
-	const getDataDashboard = async() =>{
-		setIsSpin(true)
+	const getDataDashboard = async () => {
+		setIsSpin(true);
 		try {
-			const res = await getDashboard()
+			const res = await getDashboard();
+
 			setDashboarDisplay({
-				numFamily: res.data.results.numFamily,
+				numGroup: res.data.results.numGroup,
 				numUser: res.data.results.numUser,
 				userOfDate: res.data.results.userOfDate,
 			});
 
-			const vnpStatus = await getVnpStatus()
-			console.log(vnpStatus)
+			const vnpStatus = await getVnpStatus();
+			console.log(vnpStatus);
 			setVnpStatus(vnpStatus.data.data.enable);
 
-			setIsSpin(false)
-			
+			setIsSpin(false);
 		} catch (error) {
-			setIsSpin(false)
+			setIsSpin(false);
 		}
-	}
+	};
 
 	useEffect(() => {
-		getDataDashboard()
+		getDataDashboard();
 	}, [getAccessToken()]);
 
 	const [isSpin, setIsSpin] = useState(true);
@@ -72,7 +71,7 @@ export default function DashBoard() {
 			position: 'middle',
 			style: {
 				fill: '#FFFFFF',
-				opacity: 0.6,
+				opacity: 0.2,
 			},
 		},
 		xAxis: {
@@ -83,43 +82,42 @@ export default function DashBoard() {
 		},
 	};
 
-	const handleSwitchStatus = async(status : boolean) => {
+	const handleSwitchStatus = async (status: boolean) => {
 		console.log(status);
 		try {
 			const objParam = {
-				enable : status
+				enable: status,
 			};
 			const res = await updateVnpStatus(objParam);
-			if(res.data.status == true) {
-				if(status) {
-					message.success("You just turn on Vn Pay");
+			if (res.data.status == true) {
+				if (status) {
+					message.success('You just turn on Vn Pay');
 				} else {
-					message.success("You just turn off Vn Pay");
+					message.success('You just turn off Vn Pay');
 				}
-				
+
 				setVnpStatus(status);
 			}
 			console.log(res);
-			
 		} catch (error) {
 			console.log(error);
 		}
-    };
+	};
 
 	return (
 		<div>
-			{isSpin ?
-				<div className=' h-screen flex justify-center items-center'>
-					<Spin size="large" spinning={isSpin} />
-
+			{isSpin ? (
+				<div className=" h-screen flex justify-center items-center">
+					{/* <Spin size="large" spinning={isSpin} /> */}
+					<Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />} />
 				</div>
-				:
+			) : (
 				<>
 					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
 						<h1 className="text-xl sm:text-base sm:font-semibold sm:mb-2">Analytics Dashboard</h1>
 						<p>
-							Manage web environment design, deployment, development and maintenance activities. Perform testing
-							and quality assurance of web sites and web applications
+							Manage web environment design, deployment, development and maintenance activities. Perform
+							testing and quality assurance of web sites and web applications
 						</p>
 					</div>
 					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
@@ -127,15 +125,15 @@ export default function DashBoard() {
 						<div className="flex  sm:justify-center ">
 							<div className="w-1/3 sm:w-full sm:mb-2 flex items-center sm:bock sm:text-center sm:flex-col">
 								<UserOutlined className="image-dashboard mr-3 " />
-								<p className="mb-0 text-[1rem]  font-medium">{dashboarDisplay.numUser} People</p>
+								<p className="mb-0 text-[1rem]  font-medium">{dashboarDisplay.numUser} User</p>
 							</div>
 							<div className="w-1/3 sm:w-full sm:mb-2 flex items-center sm:bock sm:text-center sm:flex-col">
 								<HomeOutlined className="image-dashboard mr-3" />
-								<p className="mb-0 text-[1rem] font-medium">{dashboarDisplay.numFamily} Families</p>
+								<p className="mb-0 text-[1rem] font-medium">{dashboarDisplay.numGroup} Groups</p>
 							</div>
 							<div className="w-1/3 sm:w-full flex items-center sm:bock sm:text-center sm:flex-col">
 								<TeamOutlined className="image-dashboard mr-3 " />
-								<p className="mb-0 text-[1rem] font-medium">{total} New users</p>
+								<p className="mb-0 text-[1rem] font-medium">{total} New Users </p>
 							</div>
 						</div>
 					</div>
@@ -143,25 +141,21 @@ export default function DashBoard() {
 						<h1 className="text-xl sm:text-base mb-9">
 							The bar chart shows the number of new users per day for the last 30 days
 						</h1>
-						<Column {...config} />
+						<Column color={'#2DC5DD'} {...config} />
 					</div>
-					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
-						<h1 className="text-xl sm:text-base mb-9">
-							This switch button to show on / off VNPAY
-						</h1>
+					{/* <div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
+						<h1 className="text-xl sm:text-base mb-9">This switch button to show on / off VNPAY</h1>
 						<Space size="middle">
 							<Switch
-								checked = { vnpStatus ? vnpStatus : false }
+								checked={vnpStatus ? vnpStatus : false}
 								onChange={() => {
 									handleSwitchStatus(!vnpStatus);
 								}}
 							/>
 						</Space>
-					</div>
+					</div> */}
 				</>
-
-			}
-
+			)}
 		</div>
 	);
 }

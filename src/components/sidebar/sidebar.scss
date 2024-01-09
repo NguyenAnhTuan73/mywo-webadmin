@@ -7,10 +7,11 @@
 	color: $txtColor;
 	width: $sideBarWidth;
 	background-color: $mainBg;
-	height: 100vh;
+	min-height: 100vh;
 	position: fixed;
 	top: 0;
 	z-index: 100;
+	height: 100%;
 
 	@include tablet {
 		width: 100vw;
@@ -42,7 +43,6 @@
 		}
 
 		img {
-			width: 90%;
 			display: block;
 
 			@include tablet {
@@ -78,9 +78,10 @@
 			flex-grow: 0;
 		}
 		&__item {
+			color: $mainColor;
 			@include flex(center, flex-start);
 			position: relative;
-			margin-bottom: 2rem;
+			margin-bottom: 1rem;
 			padding-left: 5%;
 			transition: color 0.3s ease-in-out;
 
@@ -128,6 +129,7 @@
 				width: var(--size);
 				height: var(--size);
 				margin-right: 1rem;
+				color: $mainColor;
 				@include flex(center, center);
 
 				@include mobile {
@@ -151,7 +153,6 @@
 			}
 		}
 		.logout {
-			color: red;
 			font-weight: 500;
 		}
 	}

@@ -242,7 +242,9 @@ export default function ListDevices() {
 			<div className="pr-2 w-full overflow-hidden">
 				{isSpin ? (
 					<div className="w-full h-full flex justify-center items-center">
-						<Spin size="large" spinning={isSpin} />
+						<Spin
+							indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />}
+						/>
 					</div>
 				) : (
 					<Table

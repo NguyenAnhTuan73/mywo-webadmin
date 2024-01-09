@@ -30,13 +30,31 @@ module.exports = {
 			// => @media (max-width: 639px) { ... }
 			xs: { max: '320px' },
 		},
+		colors: {
+			transparent: 'transparent',
+			current: 'currentColor',
+			white: '#ffffff',
+			purple: '#3f3cbb',
+			midnight: '#121063',
+			metal: '#565584',
+			tahiti: '#3ab7bf',
+			silver: '#ecebff',
+			'bubble-gum': '#ff77e9',
+			bermuda: '#78dcca',
+			sidebar: '#ccc',
+			gray: '#808080',
+			sideMenu: '#DEF3F4',
+			clMain: '#2DC5DD',
+			red: '#FF0000',
+		},
 	},
 	fontFamily: {
 		new: ['SF Pro Text'],
 		sans: [
+			'Inter',
 			'ui-sans-serif',
 			'system-ui',
-			'-apple-system',
+
 			'BlinkMacSystemFont',
 			'"Segoe UI"',
 			'Roboto',
@@ -88,19 +106,6 @@ module.exports = {
 		sm: { max: '639px' },
 		// => @media (max-width: 639px) { ... }
 	},
-	colors: {
-		transparent: 'transparent',
-		current: 'currentColor',
-		white: '#ffffff',
-		purple: '#3f3cbb',
-		midnight: '#121063',
-		metal: '#565584',
-		tahiti: '#3ab7bf',
-		silver: '#ecebff',
-		'bubble-gum': '#ff77e9',
-		bermuda: '#78dcca',
-		sidebar: '#ccc',
-		gray: '#808080'
-	},
+
 	plugins: [],
 };

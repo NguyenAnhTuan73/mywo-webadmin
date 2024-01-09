@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Modal, Spin } from 'antd';
+import { Modal, Spin } from 'antd';
 import './PopupLogout.scss';
 
 export default function PopupLogout(props: any) {
@@ -14,10 +14,11 @@ export default function PopupLogout(props: any) {
 					visible={ModalVisible}
 					onCancel={handleCancel}
 					onOk={handleOK}
+					okButtonProps={{ style: { backgroundColor: '#29C2DB', borderColor: '#29C2DB' } }}
 					className="round-sm text-center"
 					centered
 				>
-					<p className="text-center text-red-600">Do you want to logout your account?</p>
+					<p className="text-center ">Do you want to logout your account?</p>
 				</Modal>
 			</Spin>
 		</div>

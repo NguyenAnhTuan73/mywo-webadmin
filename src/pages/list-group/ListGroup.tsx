@@ -6,19 +6,20 @@ import { LoadingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import _debounce from 'lodash/debounce';
 import _ from 'lodash';
-import { getListFamily } from '../../service/user/UserService';
+import { getListGroups } from '../../service/user/UserService';
 import { DataType } from '../../interface/list-user/list_user.interface';
-import PopupAdd from '../popup-add/PopupAdd';
+
 import { TypeDataItem } from '../../interface/manage.interface';
 import { getAccessToken } from '../../helper/tokenHelper';
+import { group } from 'console';
 
-export default function ListFamily() {
+export default function ListGroup() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isModalPopupDetail, setIsModalPopupDetail] = useState(false);
-	const [currentFamilies, setCurrentFamilies] = useState<any>(null);
+	const [currentGroups, setCurrentGroups] = useState<any>(null);
 	const [dataItem, setDataItem] = useState<any>(null);
 	const [statusActiveUser, setStatusActiveUser] = useState('');
 	const [isSpin, setIsSpin] = useState(true);
@@ -34,24 +35,25 @@ export default function ListFamily() {
 		size: 10,
 		// status: '',
 	});
-	const [blockDataFamily, setBlockDataFamily] = useState<any>({ lengthUser: 0, dataUser: [] });
+	const [blockDataGroups, setblockDataGroups] = useState<any>({ lengthUser: 0, dataGroups: [] });
 
 	// loading
 	const [spinValues, setSpinValues] = useState(false);
 	const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 	useEffect(() => {
-		getDataListFamily(objParams);
+		getDataListGroup(objParams);
 	}, [getAccessToken()]);
 
-	const getDataListFamily = async (objData = objParams) => {
+	const getDataListGroup = async (objData = objParams) => {
 		try {
 			setSpinValues(true);
 			setObjParams(objData);
-			const res = await getListFamily(objData);
+			const res = await getListGroups(objData);
+
 			setIsSpin(false);
-			setBlockDataFamily({
-				lengthUser: res.data.families.total,
-				family: res.data.families.docs?.map((item: any, index: number) => {
+			setblockDataGroups({
+				lengthUser: res.data.groups[0]?.metadata[0].total,
+				dataGroups: res.data.groups[0].data?.map((item: any, index: number) => {
 					return {
 						...item,
 						index: index + 1 + (objData.page - 1) * numberLimit,
@@ -66,7 +68,7 @@ export default function ListFamily() {
 	};
 
 	const showModal = (item: any) => {
-		setCurrentFamilies(item.userfamilies);
+		setCurrentGroups(item?.groupUser);
 		setDataItem(item);
 		setIsModalOpen(true);
 	};
@@ -83,12 +85,6 @@ export default function ListFamily() {
 		setIsModalPopupDetail(true);
 		setStatusActiveUser(activeStatus);
 	};
-	const handleCancelStatus = () => {
-		setIsModalPopupDetail(false);
-	};
-	const handleOkStatus = () => {
-		setIsModalPopupDetail(false);
-	};
 
 	const columns: ColumnsType<DataType> = [
 		{
@@ -97,6 +93,7 @@ export default function ListFamily() {
 			key: 'index',
 			width: 50,
 			className: 'text-center',
+			render: (text, object, index) => index + 1,
 		},
 		{
 			title: 'NAME',
@@ -111,16 +108,26 @@ export default function ListFamily() {
 			width: 100,
 			key: '_id',
 		},
+		{
+			title: 'STATUS',
+			dataIndex: 'status',
+			width: 100,
+			key: 'status',
+			render: (email, record) => {
+				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
+			},
+		},
 
 		{
-			title: 'MEMBERS',
-			dataIndex: 'members',
+			title: 'GROUP USERS',
+			dataIndex: 'group_users',
 			width: 100,
-			key: 'members',
+			key: 'group_users',
 			render: (family, item) => (
 				<Space size="middle">
 					<Button
 						type="primary"
+						style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}
 						onClick={() => {
 							// handleClickMore(record['_id']);
 							showModal(item);
@@ -132,40 +139,16 @@ export default function ListFamily() {
 			),
 			className: 'text-center',
 		},
-		{
-			title: 'PASS CODE',
-			width: 100,
-			key: 'pass_code',
-			dataIndex: 'pass_code',
-			className: 'text-center',
-		},
 	];
 
 	const columnsModalDetail: ColumnsType<DataType> = [
 		{
 			title: 'No.',
 			dataIndex: 'index',
-			width: '50px',
+			width: '5%',
 			key: 'index',
 			className: 'text-center',
-		},
-		{
-			title: 'FIRST NAME',
-			dataIndex: 'first_name',
-			key: 'first_name',
-			width: '100px',
-		},
-		{
-			title: 'LAST NAME',
-			dataIndex: 'last_name',
-			key: 'last_name',
-			width: '100px',
-		},
-		{
-			title: 'EMAIL',
-			dataIndex: 'email',
-			key: 'email',
-			width: '200px',
+			render: (text, object, index) => index + 1,
 		},
 		{
 			title: 'ID',
@@ -174,54 +157,52 @@ export default function ListFamily() {
 			width: '150px',
 		},
 		{
-			title: 'USER',
-			dataIndex: 'user',
-			key: 'user',
-			width: '150px',
+			title: 'FIRST NAME',
+			dataIndex: 'fname',
+			key: 'fname',
 		},
-
 		{
-			title: 'STATUS',
-			dataIndex: 'Status',
-			key: 'status',
-			width: '150px',
-			render: (_, record) => (
-				<Space size="middle">
-					<Switch
-						checked={record.status === 'active'}
-						onChange={() => {
-							handleChangeStatus(record['_id'], record.status);
-						}}
-					/>
-				</Space>
-			),
-			className: 'text-center',
+			title: 'LAST NAME',
+			dataIndex: 'lname',
+			key: 'lname',
 		},
-
 		{
 			title: 'ROLE',
 			dataIndex: 'role',
 			key: 'role',
-			width: '100px',
-			className: 'text-center',
+			render: (email, record) => {
+				return record.role?.charAt(0).toUpperCase() + record.role?.slice(1);
+			},
+		},
+		{
+			title: 'TYPE',
+			dataIndex: 'role',
+			key: 'role',
+			render: (email, record) => {
+				return record.type?.charAt(0).toUpperCase() + record.type?.slice(1);
+			},
+		},
+		{
+			title: 'STATUS',
+			key: 'status',
+			dataIndex: 'status',
+			width: '10%',
+			render: (email, record) => {
+				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
+			},
+		},
+
+		{
+			title: 'EMAIL',
+			dataIndex: 'email',
+			key: 'email',
 		},
 	];
-	const dataShowItemFamily = currentFamilies?.map((items: TypeDataItem, index: number) => {
-		return {
-			_id: items['_id'],
-			user: items.user,
-			status: items.status,
-			role: items.role,
-			email: items.userInfo[0].email,
-			first_name: items.userInfo[0].first_name,
-			last_name: items.userInfo[0].last_name,
-			index: index + 1,
-		};
-	});
+
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
 		setNumberLimit(pageSize);
 		setNumberPage(current);
-		getDataListFamily({
+		getDataListGroup({
 			...objParams,
 			page: current,
 			size: pageSize,
@@ -238,7 +219,7 @@ export default function ListFamily() {
 	const handleClickSearch = (e: any) => {
 		setIsSpin(true);
 		setFilterSearch(e.target.value);
-		getDataListFamily({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+		getDataListGroup({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
 	};
 	const handleChange = (e: any) => {
 		setFilterSearch(e.target.value);
@@ -257,7 +238,7 @@ export default function ListFamily() {
 	return (
 		<>
 			<div className="">
-				<h1 className="text-base font-bold"> USER FAMILIES LIST</h1>
+				<h1 className="text-base font-bold"> USER GROUPS LIST</h1>
 				<div className="flex items-center justify-between sm:flex-col">
 					<div className="w-1/3 min-w-[220px]  xl:w-full my-3 sm:my-4 mr-3 xl:mr-0 flex items center">
 						<Input
@@ -265,7 +246,7 @@ export default function ListFamily() {
 							onChange={e => handleChange(e)}
 							onKeyDown={handleEnterSearch}
 						/>
-						<Button type="primary">
+						<Button type="primary" style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}>
 							<div className="flex items-center" onClick={handleClickSearch}>
 								<i className="bx bx-search text-base mr-1"></i>
 								<span>Search</span>
@@ -273,20 +254,22 @@ export default function ListFamily() {
 						</Button>
 					</div>
 					<div className="w-40 mr-3 md:w-30 sm:w-full sm:mb-2 sm:mr-0">
-						<p className="mb-0 font-semibold">Total : {blockDataFamily.lengthUser} families</p>
+						<p className="mb-0 font-semibold">Total : {blockDataGroups.lengthUser} Groups</p>
 					</div>
 				</div>
 				<div className="overflow-hidden">
 					{isSpin ? (
 						<div className="w-full h-full flex justify-center items-center">
-							<Spin size="large" spinning={isSpin} />
+							<Spin
+								indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />}
+							/>
 						</div>
 					) : (
 						<Table
 							bordered
 							columns={columns}
 							scroll={{ x: 700 }}
-							dataSource={blockDataFamily.family}
+							dataSource={blockDataGroups.dataGroups}
 							pagination={false}
 							locale={{
 								emptyText: (
@@ -307,7 +290,7 @@ export default function ListFamily() {
 					<Pagination
 						showSizeChanger
 						defaultCurrent={1}
-						total={blockDataFamily.lengthUser}
+						total={blockDataGroups.lengthUser}
 						onChange={onShowSizeChange}
 						locale={{ items_per_page: ' Families per page' }}
 					/>
@@ -317,7 +300,7 @@ export default function ListFamily() {
 				<Modal
 					title={
 						<div>
-							LIST DETAILS MEMBER USER: <span className="text-red-600">{dataItem?.name}</span>{' '}
+							GROUP NAME: <span className="text-red-600">{dataItem?.name}</span>{' '}
 						</div>
 					}
 					visible={isModalOpen}
@@ -331,17 +314,11 @@ export default function ListFamily() {
 					<Table
 						className="min-w-full"
 						columns={columnsModalDetail}
-						dataSource={dataShowItemFamily}
-						pagination={false}
+						dataSource={dataItem?.groupUsers}
+						bordered
 					/>
 				</Modal>
 			</div>
-			<PopupAdd
-				ModalVisibleAdd={isModalPopupDetail}
-				handleCancelAdd={handleCancelStatus}
-				handleOKAdd={handleOkStatus}
-				statusActiveUser={statusActiveUser}
-			/>
 		</>
 	);
 }
