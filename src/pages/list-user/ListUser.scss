@@ -1,0 +1,77 @@
+@use '../../scss/abstracts/' as *;
+@use 'sass:math';
+.site-layout {
+	width: 100%;
+}
+.ant-table-wrapper {
+	min-width: 650px;
+}
+.icon-web {
+	display: none;
+}
+// .site-layout {
+// 	min-width: 1100px;
+// }
+.ant-input-clear-icon {
+	display: flex;
+	align-items: center;
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+.ant-pagination-item-link {
+	span {
+		display: flex;
+		align-items: center;
+		svg {
+			margin: 0 auto;
+		}
+	}
+}
+.ant-input {
+	line-height: 1.56;
+}
+// css in modal add point
+.ant-modal-mask {
+	background-color: rgba(0, 0, 0, 0.3);
+}
+.ant-modal-content {
+	border-radius: 8px;
+}
+
+.ant-modal-content {
+	box-shadow: 1px 1px 3px rgba(200, 199, 199, 0.6);
+}
+// .ant-modal-header {
+// 	border-bottom: 0;
+// 	border: 1px solid #f0f0f0;
+// }
+.ant-table-thead > tr > th {
+	text-align: center;
+}
+.ant-select {
+	margin-right: 1rem;
+	@include tablet {
+		margin-right: 0.5rem;
+	}
+	@include mobile {
+		margin-right: 0;
+		margin-bottom: 0.5rem;
+	}
+}
+.ant-table-thead > tr > th {
+	background-color: #dddada;
+}
+.ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+	@include tablet {
+		padding: 0.5rem;
+		line-height: 1.1;
+	}
+}
+.ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td {
+	@include tablet {
+		padding: 0.5rem;
+		line-height: 1.3;
+	}
+}

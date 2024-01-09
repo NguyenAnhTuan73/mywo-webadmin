@@ -1,0 +1,32 @@
+@use '../../scss/abstracts/' as *;
+@use 'sass:math';
+
+.ant-table-wrapper {
+	min-width: 650px;
+	.ant-table-thead {
+		min-width: 650px;
+	}
+}
+.site-layout {
+	min-width: 1100px;
+}
+.ant-input-clear-icon {
+	display: flex;
+	align-items: center;
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+.ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > thead > tr > th {
+	@include tablet {
+		padding: 0.5rem;
+		line-height: 1.1;
+	}
+}
+.ant-table.ant-table-bordered > .ant-table-container > .ant-table-content > table > tbody > tr > td {
+	@include tablet {
+		padding: 0.5rem;
+		line-height: 1.3;
+	}
+}
