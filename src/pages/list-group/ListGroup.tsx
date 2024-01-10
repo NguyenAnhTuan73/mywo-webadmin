@@ -29,10 +29,14 @@ export default function ListGroup() {
 		size: '',
 		// status: '',
 	});
+	const params = new URLSearchParams(location.search);
+	const searchValue = params.get('search');
+	const pageValue = params.get('page') == null ? 0 : params.get('page');
+	const sizeValue = params.get('size') == null ? 10 : params.get('size');
 	const [objParams, setObjParams] = useState({
-		search: '',
-		page: 1,
-		size: 10,
+		search: searchValue,
+		page: pageValue,
+		size: sizeValue,
 		// status: '',
 	});
 	const [blockDataGroups, setblockDataGroups] = useState<any>({ lengthUser: 0, dataGroups: [] });
@@ -44,9 +48,9 @@ export default function ListGroup() {
 		getDataListGroup(objParams);
 	}, [getAccessToken()]);
 
-	const getDataListGroup = async (objData = objParams) => {
+	const getDataListGroup = async (objData: any) => {
+		setSpinValues(true);
 		try {
-			setSpinValues(true);
 			setObjParams(objData);
 			const res = await getListGroups(objData);
 
@@ -56,7 +60,7 @@ export default function ListGroup() {
 				dataGroups: res.data.groups[0].data?.map((item: any, index: number) => {
 					return {
 						...item,
-						index: index + 1 + (objData.page - 1) * numberLimit,
+						index: index + 1 + (objData.page - 1 < 0 ? 0 : objData.page) * numberLimit,
 					};
 				}),
 			});
@@ -64,6 +68,7 @@ export default function ListGroup() {
 			setIsSpin(false);
 		} catch (error) {
 			setIsSpin(false);
+			setSpinValues(false);
 		}
 	};
 
@@ -81,10 +86,6 @@ export default function ListGroup() {
 		setIsModalOpen(false);
 	};
 	// Popup change status
-	const handleChangeStatus = (paramsUuid: string, activeStatus: string) => {
-		setIsModalPopupDetail(true);
-		setStatusActiveUser(activeStatus);
-	};
 
 	const columns: ColumnsType<DataType> = [
 		{
@@ -93,7 +94,6 @@ export default function ListGroup() {
 			key: 'index',
 			width: 50,
 			className: 'text-center',
-			render: (text, object, index) => index + 1,
 		},
 		{
 			title: 'NAME',
@@ -127,7 +127,7 @@ export default function ListGroup() {
 				<Space size="middle">
 					<Button
 						type="primary"
-						style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}
+						style={{ backgroundColor: '#13ae81', border: '#13ae81' }}
 						onClick={() => {
 							// handleClickMore(record['_id']);
 							showModal(item);
@@ -204,7 +204,7 @@ export default function ListGroup() {
 		setNumberPage(current);
 		getDataListGroup({
 			...objParams,
-			page: current,
+			page: current - 1,
 			size: pageSize,
 		});
 		setSearchParams({
@@ -220,6 +220,12 @@ export default function ListGroup() {
 		setIsSpin(true);
 		setFilterSearch(e.target.value);
 		getDataListGroup({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+		setSearchParams({
+			...Object.fromEntries(searchParams.entries()),
+			search: e.target.value,
+			page: `1`,
+			size: `10`,
+		});
 	};
 	const handleChange = (e: any) => {
 		setFilterSearch(e.target.value);
@@ -239,37 +245,43 @@ export default function ListGroup() {
 		<>
 			<div className="">
 				<h1 className="text-base font-bold"> USER GROUPS LIST</h1>
-				<div className="flex items-center justify-between sm:flex-col">
-					<div className="w-1/3 min-w-[220px]  xl:w-full my-3 sm:my-4 mr-3 xl:mr-0 flex items center">
-						<Input
-							placeholder="Find family by..."
-							onChange={e => handleChange(e)}
-							onKeyDown={handleEnterSearch}
-						/>
-						<Button type="primary" style={{ backgroundColor: '#2DC5DD', border: '#2DC5DD' }}>
-							<div className="flex items-center" onClick={handleClickSearch}>
-								<i className="bx bx-search text-base mr-1"></i>
-								<span>Search</span>
-							</div>
-						</Button>
-					</div>
-					<div className="w-40 mr-3 md:w-30 sm:w-full sm:mb-2 sm:mr-0">
-						<p className="mb-0 font-semibold">Total : {blockDataGroups.lengthUser} Groups</p>
+
+				<div className="flex items-center justify-between  xl:min-w-max sm:flex-col">
+					<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-8 sm:mb-2">
+						<div className="w-1/3 min-w-[220px] md:w-full xl:w-2/3  my-3 sm:my-4 mr-3 xl:mr-0 flex items-center">
+							<Input
+								placeholder="Find groups by..."
+								onChange={e => handleChange(e)}
+								onKeyDown={handleEnterSearch}
+							/>
+							<Button type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
+								<div className="flex items-center" onClick={handleClickSearch}>
+									<i className="bx bx-search text-base mr-1"></i>
+									<span>Search</span>
+								</div>
+							</Button>
+						</div>
+
+						<div className=" h-full ml-1 md:w-30 sm:w-full ">
+							<p className="mb-0 sm:my-2 sm:float-left  w-full inline-block  font-semibold">
+								Total : {blockDataGroups.lengthUser} Groups
+							</p>
+						</div>
 					</div>
 				</div>
 				<div className="overflow-hidden">
 					{isSpin ? (
 						<div className="w-full h-full flex justify-center items-center">
 							<Spin
-								indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />}
+								indicator={<LoadingOutlined style={{ fontSize: 32, color: '#13ae81' }} spin={isSpin} />}
 							/>
 						</div>
 					) : (
 						<Table
 							bordered
 							columns={columns}
-							scroll={{ x: 700 }}
-							dataSource={blockDataGroups.dataGroups}
+							scroll={{ x: 'max-content' }}
+							dataSource={blockDataGroups?.dataGroups}
 							pagination={false}
 							locale={{
 								emptyText: (
@@ -279,7 +291,6 @@ export default function ListGroup() {
 										) : (
 											<span className="italic font-medium  text-center">No data</span>
 										)}
-										,
 									</>
 								),
 							}}
@@ -288,11 +299,12 @@ export default function ListGroup() {
 				</div>
 				<div className="flex justify-end mt-3 ">
 					<Pagination
+						current={Number(pageValue) === 0 ? 1 : Number(pageValue)}
 						showSizeChanger
 						defaultCurrent={1}
-						total={blockDataGroups.lengthUser}
+						total={blockDataGroups?.lengthUser}
 						onChange={onShowSizeChange}
-						locale={{ items_per_page: ' Families per page' }}
+						locale={{ items_per_page: ' Groups per page' }}
 					/>
 				</div>
 			</div>

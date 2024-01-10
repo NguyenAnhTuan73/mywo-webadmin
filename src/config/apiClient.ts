@@ -62,10 +62,9 @@ apiClient.interceptors.response.use(
 			originalConfig._retry = true;
 			await userRefreshToken();
 			return apiClient(originalConfig);
-
 		}
-		if(err?.response?.status === 413){
-			message.error('Payload too large')
+		if (err?.response?.status === 413) {
+			message.error('Payload too large');
 		}
 
 		if (err?.response?.status === 403 && !err.config._retry) {

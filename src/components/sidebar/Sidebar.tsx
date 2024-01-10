@@ -47,12 +47,16 @@ const Sidebar = () => {
 
 	return (
 		<>
-			<div className="sidebar w-1/3 ">
-				<div className="sidebar__logo">
-					<div className="flex justify-start w-full">
+			<div className="sidebar w-1/3 shadow-xl ">
+				<div onClick={() => navigate('/dashboard')} className="sidebar__logo cursor-pointer">
+					<div className="flex justify-start items-center w-full">
 						<img className="h-10 block pl-[5%] " src={images.logo} alt="" />
+						<span className="ml-2 text-white text-2xl font-semibold">MYWO</span>
 					</div>
-					<div className="sidebar-close hover:text-red-600 duration-300 sm:mr-5" onClick={closeSidebar}>
+					<div
+						className="sidebar-close hover:text-red-600 duration-300 sm:mr-5 text-red"
+						onClick={closeSidebar}
+					>
 						<i className="bx bx-x"></i>
 					</div>
 				</div>

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 import moment from 'moment';
-import { Spin, Space, Switch, message } from 'antd';
+import { Spin, message } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { UserOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
 import { getDashboard, getVnpStatus, updateVnpStatus } from '../../service/user/UserService';
 import { Column } from '@ant-design/plots';
-import './DashBoard.scss';
 import { TypeData } from '../../interface/manage.interface';
 import { getAccessToken } from '../../helper/tokenHelper';
-import { colors } from '../../constant';
+import './DashBoard.scss';
 
 export default function DashBoard() {
 	const [dashboarDisplay, setDashboarDisplay] = useState<TypeData>({
@@ -31,9 +30,9 @@ export default function DashBoard() {
 				userOfDate: res.data.results.userOfDate,
 			});
 
-			const vnpStatus = await getVnpStatus();
-			console.log(vnpStatus);
-			setVnpStatus(vnpStatus.data.data.enable);
+			// const vnpStatus = await getVnpStatus();
+			// console.log(vnpStatus);
+			// setVnpStatus(vnpStatus.data.data.enable);
 
 			setIsSpin(false);
 		} catch (error) {
@@ -67,11 +66,14 @@ export default function DashBoard() {
 		data,
 		xField: 'day',
 		yField: 'value',
+		columnStyle: {
+			width: 30, // Set the width of the columns here
+		},
 		label: {
 			position: 'middle',
 			style: {
 				fill: '#FFFFFF',
-				opacity: 0.2,
+				opacity: 1,
 			},
 		},
 		xAxis: {
@@ -109,23 +111,23 @@ export default function DashBoard() {
 			{isSpin ? (
 				<div className=" h-screen flex justify-center items-center">
 					{/* <Spin size="large" spinning={isSpin} /> */}
-					<Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />} />
+					<Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: '#13ae81' }} spin={isSpin} />} />
 				</div>
 			) : (
 				<>
-					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
+					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg shadow-xl">
 						<h1 className="text-xl sm:text-base sm:font-semibold sm:mb-2">Analytics Dashboard</h1>
 						<p>
 							Manage web environment design, deployment, development and maintenance activities. Perform
 							testing and quality assurance of web sites and web applications
 						</p>
 					</div>
-					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
+					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg shadow-xl">
 						<h1 className="text-xl sm:text-base mb-3">Portfolio Performance</h1>
 						<div className="flex  sm:justify-center ">
 							<div className="w-1/3 sm:w-full sm:mb-2 flex items-center sm:bock sm:text-center sm:flex-col">
 								<UserOutlined className="image-dashboard mr-3 " />
-								<p className="mb-0 text-[1rem]  font-medium">{dashboarDisplay.numUser} User</p>
+								<p className="mb-0 text-[1rem]  font-medium">{dashboarDisplay.numUser} Users</p>
 							</div>
 							<div className="w-1/3 sm:w-full sm:mb-2 flex items-center sm:bock sm:text-center sm:flex-col">
 								<HomeOutlined className="image-dashboard mr-3" />
@@ -137,11 +139,11 @@ export default function DashBoard() {
 							</div>
 						</div>
 					</div>
-					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
+					<div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg shadow-xl">
 						<h1 className="text-xl sm:text-base mb-9">
 							The bar chart shows the number of new users per day for the last 30 days
 						</h1>
-						<Column color={'#2DC5DD'} {...config} />
+						<Column color={'#13AE81'} {...config} />
 					</div>
 					{/* <div className="bg-white p-5 sm:p-2 my-10 sm:my-5 rounded-lg">
 						<h1 className="text-xl sm:text-base mb-9">This switch button to show on / off VNPAY</h1>

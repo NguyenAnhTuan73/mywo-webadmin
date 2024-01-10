@@ -24,8 +24,8 @@ export interface DataType {
 }
 
 export interface TypeObjParams {
-	page: number;
-	size: number;
+	page?: number;
+	size?: number;
 }
 
 export interface TypeSelect {

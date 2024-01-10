@@ -15,6 +15,7 @@ import { getAccessToken } from '../../helper/tokenHelper';
 
 export default function ListDevices() {
 	const [isSpin, setIsSpin] = useState(true);
+	const [spinValues, setSpinValues] = useState(false);
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [appVersion, setAppVersion] = useState<any>();
 	const [numberPage, setNumberPage] = useState(1);
@@ -25,13 +26,15 @@ export default function ListDevices() {
 		search: '',
 		page: '',
 		size: '',
-		app_version: '',
 	});
+	const params = new URLSearchParams(location.search);
+	const searchValue = params.get('search') == null ? '' : params.get('search');
+	const pageValue = params.get('page') == null ? 1 : params.get('page');
+	const sizeValue = params.get('size') == null ? 10 : params.get('size');
 	const [objParams, setObjParams] = useState({
-		search: '',
-		page: 1,
-		size: 10,
-		app_version: '',
+		search: searchValue,
+		page: pageValue,
+		size: sizeValue,
 	});
 	// lodash
 
@@ -47,10 +50,12 @@ export default function ListDevices() {
 		getAppVersion();
 		getDataListDevice(objParams);
 	}, [getAccessToken()]);
-	const getDataListDevice = async (objData = objParams) => {
+	const getDataListDevice = async (objData: any) => {
 		try {
+			setSpinValues(true);
 			setObjParams(objData);
 			const res = await getListDevice(objData);
+
 			setIsSpin(false);
 			setBlockDataDevices({
 				lengthUser: res.data.devices.total,
@@ -61,8 +66,10 @@ export default function ListDevices() {
 					};
 				}),
 			});
+			setSpinValues(false);
 		} catch (error) {
 			setIsSpin(false);
+			setSpinValues(false);
 		}
 	};
 
@@ -71,7 +78,6 @@ export default function ListDevices() {
 		await getDataListDevice({
 			...objParams,
 			page: 1,
-			app_version: e,
 		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
@@ -89,23 +95,20 @@ export default function ListDevices() {
 			className: 'text-center',
 		},
 		{
+			title: 'DEVICE ID',
+			dataIndex: 'user_id',
+			key: 'user_id',
+		},
+		{
 			title: 'DEVICE MODEL',
 			dataIndex: 'device_model',
 			key: 'device_model',
-			width: '16%',
-		},
-		{
-			title: 'DEVICE ID',
-			dataIndex: 'device_id',
-			key: 'device_id',
-			width: '28%',
 		},
 
 		{
 			title: 'LANGUAGE',
 			key: 'language',
 			dataIndex: 'language',
-			width: '5%',
 			className: 'text-center',
 		},
 		{
@@ -119,29 +122,29 @@ export default function ListDevices() {
 			title: 'APP VERSION',
 			key: 'app_version',
 			dataIndex: 'app_version',
-			width: '10%',
+
 			className: 'text-center',
 		},
 		{
 			title: 'OS VERSION',
 			key: 'os_version',
 			dataIndex: 'os_version',
-			width: '9%',
+
 			className: 'text-center',
 		},
 
-		{
-			title: 'FIRST NAME',
-			key: 'first_name',
-			dataIndex: 'first_name',
-			width: '10%',
-		},
-		{
-			title: 'LAST NAME',
-			key: 'last_name',
-			dataIndex: 'last_name',
-			width: '10%',
-		},
+		// {
+		// 	title: 'FIRST NAME',
+		// 	key: 'first_name',
+		// 	dataIndex: 'first_name',
+		// 	width: '10%',
+		// },
+		// {
+		// 	title: 'LAST NAME',
+		// 	key: 'last_name',
+		// 	dataIndex: 'last_name',
+		// 	width: '10%',
+		// },
 	];
 
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
@@ -163,12 +166,12 @@ export default function ListDevices() {
 
 	const renderBlockDataDevices = blockDataDevices.dataDevices.map((item: TypeDataDevices) => {
 		return {
-			user_id: item?.user_id,
+			user_id: item?._id,
 			device_id: item?.device_id,
 			device_model: item?.device_model,
 			app_version: item?.app_version,
 			os_version: item?.os_version,
-			language: item?.language,
+			language: item?.language?.toUpperCase(),
 			currency: item?.currency,
 			first_name: item.user[0]?.first_name,
 			last_name: item.user[0]?.last_name,
@@ -181,6 +184,12 @@ export default function ListDevices() {
 		setIsSpin(true);
 		setFilterSearch(e.target.value);
 		getDataListDevice({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+		setSearchParams({
+			...Object.fromEntries(searchParams.entries()),
+			search: e.target.value,
+			page: `1`,
+			size: `10`,
+		});
 	};
 	const handleChange = (e: any) => {
 		setFilterSearch(e.target.value);
@@ -199,51 +208,35 @@ export default function ListDevices() {
 		// <div className="md:overflow-y-auto">
 		<div className="">
 			<h1 className="text-base font-bold">DEVICES LIST</h1>
-			<div className="flex items-center justify-between sm:flex-col">
-				<div className="w-1/3 min-w-[220px]  xl:w-full my-3 sm:my-4 mr-3  flex items center">
-					<Input
-						placeholder="Find devices model..."
-						onChange={e => handleChange(e)}
-						onKeyDown={handleEnterSearch}
-					/>
-					<Button type="primary">
-						<div className="flex items-center" onClick={handleClickSearch}>
-							<i className="bx bx-search text-base mr-1"></i>
-							<span>Search</span>
-						</div>
-					</Button>
-				</div>
-				<Select
-					className="sm:w-full w-[8rem] ml-2 sm:ml-0 sm:mb-4 "
-					style={{ marginRight: '10px' }}
-					defaultValue={'All Version'}
-					onChange={e => {
-						handleChangeSelectAppVersion(e);
-					}}
-				>
-					<Option key={''} value={''}>
-						{'All Version'}
-					</Option>
-					{appVersion?.map((itemVersion: string, index: number) => {
-						return (
-							<>
-								<Option key={index} value={itemVersion}>
-									{itemVersion}
-								</Option>
-							</>
-						);
-					})}
-				</Select>
 
-				<div className="w-40 mr-3 md:w-30 sm:w-full sm:mb-2">
-					<p className="mb-0 font-semibold">Total : {blockDataDevices.lengthUser} users</p>
+			<div className="flex items-center justify-between  xl:min-w-max sm:flex-col">
+				<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-8 sm:mb-2">
+					<div className="w-1/3 min-w-[220px] md:w-full xl:w-2/3  my-3 sm:my-4 mr-3 xl:mr-0 flex items-center">
+						<Input
+							placeholder="Find devices by..."
+							onChange={e => handleChange(e)}
+							onKeyDown={handleEnterSearch}
+						/>
+						<Button type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
+							<div className="flex items-center" onClick={handleClickSearch}>
+								<i className="bx bx-search text-base mr-1"></i>
+								<span>Search</span>
+							</div>
+						</Button>
+					</div>
+
+					<div className=" h-full ml-1 md:w-30 sm:w-full ">
+						<p className="mb-0 sm:my-2 sm:float-left  w-full inline-block  font-semibold">
+							Total : {blockDataDevices?.lengthUser} devices
+						</p>
+					</div>
 				</div>
 			</div>
 			<div className="pr-2 w-full overflow-hidden">
 				{isSpin ? (
 					<div className="w-full h-full flex justify-center items-center">
 						<Spin
-							indicator={<LoadingOutlined style={{ fontSize: 32, color: '#2DC5DD' }} spin={isSpin} />}
+							indicator={<LoadingOutlined style={{ fontSize: 32, color: '#13ae81' }} spin={isSpin} />}
 						/>
 					</div>
 				) : (
@@ -253,6 +246,17 @@ export default function ListDevices() {
 						scroll={{ x: 'max-content' }}
 						dataSource={renderBlockDataDevices}
 						pagination={false}
+						locale={{
+							emptyText: (
+								<>
+									{spinValues ? (
+										<Spin indicator={antIcon} spinning={spinValues} />
+									) : (
+										<span className="italic font-medium  text-center">No data</span>
+									)}
+								</>
+							),
+						}}
 					/>
 				)}
 			</div>
@@ -260,8 +264,9 @@ export default function ListDevices() {
 			<div className="flex justify-end mt-3 ">
 				<Pagination
 					showSizeChanger
+					current={Number(pageValue)}
 					defaultCurrent={1}
-					total={blockDataDevices.lengthUser}
+					total={blockDataDevices?.lengthUser}
 					onChange={onShowSizeChange}
 					locale={{ items_per_page: ' Devices per page' }}
 				/>

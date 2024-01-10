@@ -73,8 +73,9 @@ export default function Authenticate() {
 						form={formAuthenticate}
 					>
 						<div className="px-5 py-10">
-							<div className="w-full mb-5 ">
-								<img className=" mx-auto block h-10" src={images.logo} alt="" />
+							<div className="w-full mb-5 flex items-center justify-center ">
+								<img className="  block h-10" src={images.logo} alt="" />
+								<span className="ml-2 text-2xl font-semibold">MYWO</span>
 							</div>
 							<Form.Item
 								name="email"
@@ -151,8 +152,8 @@ export default function Authenticate() {
 									disabled={statusButtonAuthen}
 									type="text"
 									htmlType="submit"
-									style={{ backgroundColor: '#3DCFE3' }}
-									className="w-full rounded-md border-[#3DCFE3] mt-5 "
+									style={{ backgroundColor: '#13AE81' }}
+									className="w-full rounded-md border-[#13AE81] mt-5 "
 								>
 									<span className="text-white">Submit</span>
 								</Button>

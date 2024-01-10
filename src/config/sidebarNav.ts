@@ -15,7 +15,7 @@ const sidebarNav = [
 		link: '/group-list',
 		section: 'group-list',
 		icon: 'bx bx-receipt',
-		text: 'GROUP LIST',
+		text: 'GROUPS LIST',
 	},
 	{
 		link: '/devices-list',

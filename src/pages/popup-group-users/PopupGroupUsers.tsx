@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Pagination, PaginationProps, Table } from 'antd';
+import { Modal, Pagination, PaginationProps, Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { DataType } from '../../interface/list-user/list_user.interface';
 
 const PopupGroupUsers = (props: any) => {
 	const { currentUser, isModalOpen, handleOk, handleCancel } = props;
-	console.log('🚀 ~ PopupGroupUsers ~ currentUser:', currentUser);
 
 	const columns: ColumnsType<DataType> = [
 		{
@@ -16,17 +15,17 @@ const PopupGroupUsers = (props: any) => {
 			className: 'text-center',
 			render: (text, object, index) => index + 1,
 		},
-		{
-			title: 'CODE',
-			dataIndex: 'point_code',
-			key: 'point_code',
-			width: '5%',
-		},
+		// {
+		// 	title: 'CODE',
+		// 	dataIndex: 'point_code',
+		// 	key: 'point_code',
+		// 	width: '5%',
+		// },
 		{
 			title: 'ROLE',
 			dataIndex: 'role',
 			key: 'role',
-			width: '10%',
+
 			render: (email, item) => {
 				return item?.role?.charAt(0).toUpperCase() + item?.role?.slice(1);
 			},
@@ -35,7 +34,7 @@ const PopupGroupUsers = (props: any) => {
 			title: 'TYPE',
 			dataIndex: 'type',
 			key: 'type',
-			width: '10%',
+
 			render: (email, item) => {
 				return item?.type?.charAt(0).toUpperCase() + item?.type?.slice(1);
 			},
@@ -45,20 +44,18 @@ const PopupGroupUsers = (props: any) => {
 			title: 'FIRST NAME',
 			dataIndex: 'fname',
 			key: 'last_name',
-			width: '12%',
 		},
 		{
 			title: 'LAST NAME',
 			dataIndex: 'lname',
 			key: 'last_name',
-			width: '12%',
 		},
 
 		{
 			title: 'EMAIL',
 			key: 'email',
 			dataIndex: 'email',
-			width: '20%',
+
 			render: (email, record) => {
 				return record.email ? record.email : record.tmp_email;
 			},
@@ -67,8 +64,8 @@ const PopupGroupUsers = (props: any) => {
 			title: 'STATUS',
 			key: 'status',
 			dataIndex: 'status',
-			width: '20%',
-			render: (email, record) => {
+
+			render: (_, record) => {
 				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
 			},
 		},
@@ -89,29 +86,29 @@ const PopupGroupUsers = (props: any) => {
 				visible={isModalOpen}
 				onOk={handleOk}
 				onCancel={handleCancel}
+				footer={null}
 				className="p-2 rounded-sm"
 				width="85%"
-				okButtonProps={{ style: { backgroundColor: '#29C2DB', borderColor: '#29C2DB' } }}
+				okButtonProps={{ style: { backgroundColor: '#13ae81', borderColor: '#13ae81' } }}
 			>
-				<div className="mb-4">Total: {currentUser?.groupUsers?.length | 0} Users</div>
+				<div className="mb-4 flex justify-end">Total: {currentUser?.groupUsers?.length | 0} Group users</div>
 				<Table
 					bordered
 					columns={columns}
-					scroll={{ x: 'max-content' }}
+					scroll={{ x: '100%' }}
 					dataSource={currentUser?.groupUsers}
-
 					// onChange={onChangePlan}
 					// locale={{
-					//  emptyText: (
-					//      <>
-					//          {spinValues ? (
-					//              <Spin indicator={antIcon} spinning={spinValues} />
-					//          ) : (
-					//              <span className="italic font-medium  text-center">No data</span>
-					//          )}
-					//          ,
-					//      </>
-					//  ),
+					// 	emptyText: (
+					// 		<>
+					// 			{spinValues ? (
+					// 				<Spin indicator={antIcon} spinning={spinValues} />
+					// 			) : (
+					// 				<span className="italic font-medium  text-center">No data</span>
+					// 			)}
+					// 			,
+					// 		</>
+					// 	),
 					// }}
 				/>
 				{/* <div className="flex justify-end mt-3 ">

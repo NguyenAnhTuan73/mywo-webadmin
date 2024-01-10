@@ -14,7 +14,7 @@ export default function PopupLogout(props: any) {
 					visible={ModalVisible}
 					onCancel={handleCancel}
 					onOk={handleOK}
-					okButtonProps={{ style: { backgroundColor: '#29C2DB', borderColor: '#29C2DB' } }}
+					okButtonProps={{ style: { backgroundColor: '#13ae81', borderColor: '#13ae81' } }}
 					className="round-sm text-center"
 					centered
 				>
