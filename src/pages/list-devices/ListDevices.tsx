@@ -42,7 +42,7 @@ export default function ListDevices() {
 		const param = ['app_version'];
 		const dataAppVersion = await getSelectToFilter(param);
 
-		setAppVersion(dataAppVersion.data.results.app_version);
+		setAppVersion(dataAppVersion.data?.results?.app_version);
 	};
 	//loading....
 	const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -110,12 +110,13 @@ export default function ListDevices() {
 			key: 'language',
 			dataIndex: 'language',
 			className: 'text-center',
+			width: '10%',
 		},
 		{
 			title: 'CURRENCY',
 			key: 'currency',
 			dataIndex: 'currency',
-			width: '8%',
+			width: '10%',
 			className: 'text-center',
 		},
 		{
@@ -129,7 +130,6 @@ export default function ListDevices() {
 			title: 'OS VERSION',
 			key: 'os_version',
 			dataIndex: 'os_version',
-
 			className: 'text-center',
 		},
 
@@ -210,7 +210,7 @@ export default function ListDevices() {
 			<h1 className="text-base font-bold">DEVICES LIST</h1>
 
 			<div className="flex items-center justify-between  xl:min-w-max sm:flex-col">
-				<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-8 sm:mb-2">
+				<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-4 sm:mb-2">
 					<div className="w-1/3 min-w-[220px] md:w-full xl:w-2/3  my-3 sm:my-4 mr-3 xl:mr-0 flex items-center">
 						<Input
 							placeholder="Find devices by..."

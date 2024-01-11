@@ -15,7 +15,8 @@
 		min-height: 100vh;
 		padding: $spacing-tb;
 		transition: all 0.5s ease-in-out;
-		background-image: url('../assets/images/background.svg');
+		// background-image: url('../assets/images/background.svg');
+		background-color: #ecfdf5;
 		background-repeat: no-repeat;
 
 		@include tablet {

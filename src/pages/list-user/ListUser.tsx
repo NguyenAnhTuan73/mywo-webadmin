@@ -1,24 +1,21 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { Space, Spin, Pagination, Input, Switch, Select, Button, Modal, Table } from 'antd';
+import { useEffect, useState, useCallback } from 'react';
+import { Space, Spin, Pagination, Input, Switch, Select, Button, Table } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { PaginationProps } from 'antd';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import _debounce from 'lodash/debounce';
 import _, { size } from 'lodash';
-import { getListUser, activeUser, verifiedEmailUser } from '../../service/user/UserService';
-import { adminAddPoint } from '../../service/auth/AuthService';
+import { getListUser } from '../../service/user/UserService';
+
 import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { dataActive, dataPlan, dataType, dataPoint, dataVerified } from './dataOptionActive';
 
 const { Option } = Select;
 import './ListUser.scss';
 import { LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from '../../helper/tokenHelper';
 import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
-import colors from './../../constant/colors';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -28,10 +25,9 @@ export default function ListUser() {
 		page: string | number | null; // Update the type here
 		size: string | number | null;
 	}
-	const navigate = useNavigate();
-	const typingTimeoutRef = useRef(null);
+
 	const [filterSearch, setFilterSearch] = useState<string>('');
-	const [statusActive, setStatusActive] = useState();
+
 	const [currentUser, setCurrentUser] = useState<any>(null);
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
@@ -197,6 +193,7 @@ export default function ListUser() {
 			title: 'STATUS',
 			dataIndex: 'Status',
 			key: 'status',
+			className: 'text-center',
 			width: '5%',
 			render: (_, record) => (
 				<Space size="middle">
@@ -311,7 +308,7 @@ export default function ListUser() {
 			<div className="">
 				<h1 className="text-base font-bold">USER ACCOUNTS LIST </h1>
 				<div className="flex items-center justify-between  xl:min-w-max sm:flex-col">
-					<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-8 sm:mb-2">
+					<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-4 sm:mb-2">
 						<div className="w-1/3 min-w-[220px] md:w-full xl:w-2/3  my-3 sm:my-4 mr-3 xl:mr-0 flex items-center">
 							<Input
 								placeholder="Find users by..."

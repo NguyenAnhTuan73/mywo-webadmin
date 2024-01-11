@@ -9,19 +9,19 @@ import _ from 'lodash';
 import { getListGroups } from '../../service/user/UserService';
 import { DataType } from '../../interface/list-user/list_user.interface';
 
-import { TypeDataItem } from '../../interface/manage.interface';
 import { getAccessToken } from '../../helper/tokenHelper';
-import { group } from 'console';
+
+import { PopupGroup } from '../popup-group/PopupGroup';
 
 export default function ListGroup() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [isModalPopupDetail, setIsModalPopupDetail] = useState(false);
+
 	const [currentGroups, setCurrentGroups] = useState<any>(null);
 	const [dataItem, setDataItem] = useState<any>(null);
-	const [statusActiveUser, setStatusActiveUser] = useState('');
+
 	const [isSpin, setIsSpin] = useState(true);
 	const [searchParams, setSearchParams] = useSearchParams({
 		search: '',
@@ -92,38 +92,39 @@ export default function ListGroup() {
 			title: 'No.',
 			dataIndex: 'index',
 			key: 'index',
-			width: 50,
+			width: '5%',
 			className: 'text-center',
-		},
-		{
-			title: 'NAME',
-			dataIndex: 'name',
-			width: 100,
-			key: 'name',
 		},
 
 		{
 			title: 'ID',
 			dataIndex: '_id',
-			width: 100,
+
 			key: '_id',
+		},
+		{
+			title: 'NAME',
+			dataIndex: 'name',
+
+			key: 'name',
 		},
 		{
 			title: 'STATUS',
 			dataIndex: 'status',
-			width: 100,
+
 			key: 'status',
-			render: (email, record) => {
-				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
+			className: 'text-center',
+			render: record => {
+				return record?.charAt(0).toUpperCase() + record?.slice(1);
 			},
 		},
 
 		{
 			title: 'GROUP USERS',
 			dataIndex: 'group_users',
-			width: 100,
+
 			key: 'group_users',
-			render: (family, item) => (
+			render: item => (
 				<Space size="middle">
 					<Button
 						type="primary"
@@ -138,64 +139,6 @@ export default function ListGroup() {
 				</Space>
 			),
 			className: 'text-center',
-		},
-	];
-
-	const columnsModalDetail: ColumnsType<DataType> = [
-		{
-			title: 'No.',
-			dataIndex: 'index',
-			width: '5%',
-			key: 'index',
-			className: 'text-center',
-			render: (text, object, index) => index + 1,
-		},
-		{
-			title: 'ID',
-			dataIndex: '_id',
-			key: '_id',
-			width: '150px',
-		},
-		{
-			title: 'FIRST NAME',
-			dataIndex: 'fname',
-			key: 'fname',
-		},
-		{
-			title: 'LAST NAME',
-			dataIndex: 'lname',
-			key: 'lname',
-		},
-		{
-			title: 'ROLE',
-			dataIndex: 'role',
-			key: 'role',
-			render: (email, record) => {
-				return record.role?.charAt(0).toUpperCase() + record.role?.slice(1);
-			},
-		},
-		{
-			title: 'TYPE',
-			dataIndex: 'role',
-			key: 'role',
-			render: (email, record) => {
-				return record.type?.charAt(0).toUpperCase() + record.type?.slice(1);
-			},
-		},
-		{
-			title: 'STATUS',
-			key: 'status',
-			dataIndex: 'status',
-			width: '10%',
-			render: (email, record) => {
-				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
-			},
-		},
-
-		{
-			title: 'EMAIL',
-			dataIndex: 'email',
-			key: 'email',
 		},
 	];
 
@@ -247,7 +190,7 @@ export default function ListGroup() {
 				<h1 className="text-base font-bold"> USER GROUPS LIST</h1>
 
 				<div className="flex items-center justify-between  xl:min-w-max sm:flex-col">
-					<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-8 sm:mb-2">
+					<div className="flex justify-between items-center md:flex-col md:items-start     sm:items-start w-full mb-4 sm:mb-2">
 						<div className="w-1/3 min-w-[220px] md:w-full xl:w-2/3  my-3 sm:my-4 mr-3 xl:mr-0 flex items-center">
 							<Input
 								placeholder="Find groups by..."
@@ -308,29 +251,7 @@ export default function ListGroup() {
 					/>
 				</div>
 			</div>
-			<div className="min-w-[1050px]">
-				<Modal
-					title={
-						<div>
-							GROUP NAME: <span className="text-red-600">{dataItem?.name}</span>{' '}
-						</div>
-					}
-					visible={isModalOpen}
-					destroyOnClose={true}
-					onOk={handleOk}
-					onCancel={handleCancel}
-					className="p-2 pb-4 rounded-sm min-w-[67rem]"
-					footer={null}
-					width={'90%'}
-				>
-					<Table
-						className="min-w-full"
-						columns={columnsModalDetail}
-						dataSource={dataItem?.groupUsers}
-						bordered
-					/>
-				</Modal>
-			</div>
+			<PopupGroup isModalOpen={isModalOpen} dataItem={dataItem} handleOk={handleOk} handleCancel={handleCancel} />
 		</>
 	);
 }

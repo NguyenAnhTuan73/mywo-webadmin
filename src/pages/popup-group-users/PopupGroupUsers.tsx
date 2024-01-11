@@ -22,6 +22,16 @@ const PopupGroupUsers = (props: any) => {
 		// 	width: '5%',
 		// },
 		{
+			title: 'FIRST NAME',
+			dataIndex: 'fname',
+			key: 'last_name',
+		},
+		{
+			title: 'LAST NAME',
+			dataIndex: 'lname',
+			key: 'last_name',
+		},
+		{
 			title: 'ROLE',
 			dataIndex: 'role',
 			key: 'role',
@@ -38,17 +48,6 @@ const PopupGroupUsers = (props: any) => {
 			render: (email, item) => {
 				return item?.type?.charAt(0).toUpperCase() + item?.type?.slice(1);
 			},
-		},
-
-		{
-			title: 'FIRST NAME',
-			dataIndex: 'fname',
-			key: 'last_name',
-		},
-		{
-			title: 'LAST NAME',
-			dataIndex: 'lname',
-			key: 'last_name',
 		},
 
 		{
