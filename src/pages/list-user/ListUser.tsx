@@ -16,6 +16,8 @@ import './ListUser.scss';
 import { LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from '../../helper/tokenHelper';
 import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
+import { PopupGetToken } from '../popup-get-token/PopupGetToken';
+import { userLoginByEmail } from '../../service/auth/AuthService';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -27,7 +29,7 @@ export default function ListUser() {
 	}
 
 	const [filterSearch, setFilterSearch] = useState<string>('');
-
+	const [dataToken, setDataToken] = useState('');
 	const [currentUser, setCurrentUser] = useState<any>(null);
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
@@ -57,6 +59,7 @@ export default function ListUser() {
 
 	// show add point
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isModalOpenToken, setIsModalOpenToken] = useState(false);
 
 	const [addPoint, setAddPoint] = useState('');
 	const [idUser, setIdUser] = useState('');
@@ -112,7 +115,18 @@ export default function ListUser() {
 		setIsModalOpen(true);
 		setCurrentUser(item);
 		setIdUser(item._id);
-		setAddPoint('');
+	};
+
+	const showModalToken = async (item: any) => {
+		try {
+			const resToken = await userLoginByEmail({ email: item?.email });
+			setDataToken(resToken?.data);
+		} catch (error) {
+			setDataToken('');
+		}
+
+		setIsModalOpenToken(true);
+		setCurrentUser(item);
 	};
 
 	const handleOk = async () => {
@@ -133,8 +147,9 @@ export default function ListUser() {
 
 	const handleCancel = () => {
 		setIsModalOpen(false);
-
-		setAddPoint('');
+	};
+	const handleCancelToken = () => {
+		setIsModalOpenToken(false);
 	};
 	// total points user
 	// const viewsPointUser = (item: any) => {
@@ -240,6 +255,27 @@ export default function ListUser() {
 							onClick={() => showModal(item)}
 						>
 							View
+						</Button>
+					</>
+				);
+			},
+		},
+		{
+			title: 'GET TOKEN',
+			key: 'get_token',
+			dataIndex: 'get_token',
+			className: 'text-center ',
+			width: '9%',
+			render: (points, item) => {
+				return (
+					<>
+						<Button
+							style={{ backgroundColor: '#13ae81', border: '#13ae81' }}
+							type="primary"
+							size="middle"
+							onClick={() => showModalToken(item)}
+						>
+							Token
 						</Button>
 					</>
 				);
@@ -376,6 +412,12 @@ export default function ListUser() {
 				handleOk={handleOk}
 				handleCancel={handleCancel}
 				isModalOpen={isModalOpen}
+			/>
+			<PopupGetToken
+				isModalOpen={isModalOpenToken}
+				handleCancel={handleCancelToken}
+				currentUser={currentUser}
+				dataToken={dataToken}
 			/>
 		</>
 	);

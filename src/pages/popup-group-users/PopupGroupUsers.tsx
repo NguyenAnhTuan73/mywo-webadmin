@@ -22,6 +22,15 @@ const PopupGroupUsers = (props: any) => {
 		// 	width: '5%',
 		// },
 		{
+			title: 'ROLE',
+			dataIndex: 'role',
+			key: 'role',
+			className: 'text-center',
+			render: (email, item) => {
+				return item?.role?.charAt(0).toUpperCase() + item?.role?.slice(1);
+			},
+		},
+		{
 			title: 'FIRST NAME',
 			dataIndex: 'fname',
 			key: 'last_name',
@@ -32,21 +41,21 @@ const PopupGroupUsers = (props: any) => {
 			key: 'last_name',
 		},
 		{
-			title: 'ROLE',
-			dataIndex: 'role',
-			key: 'role',
-
-			render: (email, item) => {
-				return item?.role?.charAt(0).toUpperCase() + item?.role?.slice(1);
-			},
-		},
-		{
 			title: 'TYPE',
 			dataIndex: 'type',
 			key: 'type',
-
+			className: 'text-center',
 			render: (email, item) => {
 				return item?.type?.charAt(0).toUpperCase() + item?.type?.slice(1);
+			},
+		},
+		{
+			title: 'STATUS',
+			key: 'status',
+			dataIndex: 'status',
+			className: 'text-center',
+			render: (_, record) => {
+				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
 			},
 		},
 
@@ -57,15 +66,6 @@ const PopupGroupUsers = (props: any) => {
 
 			render: (email, record) => {
 				return record.email ? record.email : record.tmp_email;
-			},
-		},
-		{
-			title: 'STATUS',
-			key: 'status',
-			dataIndex: 'status',
-
-			render: (_, record) => {
-				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
 			},
 		},
 	];
@@ -90,7 +90,9 @@ const PopupGroupUsers = (props: any) => {
 				width="85%"
 				okButtonProps={{ style: { backgroundColor: '#13ae81', borderColor: '#13ae81' } }}
 			>
-				<div className="mb-4 flex justify-end">Total: {currentUser?.groupUsers?.length | 0} Group users</div>
+				<div className="mb-4 flex justify-end font-semibold">
+					Total: {currentUser?.groupUsers?.length | 0} Group users
+				</div>
 				<Table
 					bordered
 					columns={columns}

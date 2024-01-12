@@ -118,26 +118,24 @@ export default function ListGroup() {
 				return record?.charAt(0).toUpperCase() + record?.slice(1);
 			},
 		},
-
 		{
 			title: 'GROUP USERS',
 			dataIndex: 'group_users',
-
 			key: 'group_users',
-			render: item => (
-				<Space size="middle">
-					<Button
-						type="primary"
-						style={{ backgroundColor: '#13ae81', border: '#13ae81' }}
-						onClick={() => {
-							// handleClickMore(record['_id']);
-							showModal(item);
-						}}
-					>
-						View More
-					</Button>
-				</Space>
-			),
+			render: (_, item) => {
+				return (
+					<>
+						<Button
+							style={{ backgroundColor: '#13ae81', border: '#13ae81' }}
+							type="primary"
+							size="middle"
+							onClick={() => showModal(item)}
+						>
+							View More
+						</Button>
+					</>
+				);
+			},
 			className: 'text-center',
 		},
 	];
@@ -166,7 +164,7 @@ export default function ListGroup() {
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: e.target.value,
-			page: `1`,
+			page: `0`,
 			size: `10`,
 		});
 	};
@@ -207,7 +205,7 @@ export default function ListGroup() {
 
 						<div className=" h-full ml-1 md:w-30 sm:w-full ">
 							<p className="mb-0 sm:my-2 sm:float-left  w-full inline-block  font-semibold">
-								Total : {blockDataGroups.lengthUser} Groups
+								Total : {blockDataGroups?.lengthUser | 0} Groups
 							</p>
 						</div>
 					</div>

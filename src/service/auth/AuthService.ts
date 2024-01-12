@@ -46,6 +46,10 @@ export const userRefreshToken = async () => {
 export const userResetPassword = async (params: any) => {
 	return await apiClient.post('/send-email-forgot-pass', params);
 };
+
+export const userLoginByEmail = async (params: any) => {
+	return await apiClient.post('/users/login-by-email', params);
+};
 export const adminAddPoint = async (params: any) => {
 	return await apiClient.post('/admin/adminAddPoint', params);
 };
@@ -68,7 +72,7 @@ export const saveMailToUser = async (params: any) => {
 	return await apiClient.post('/admin/sendMailToUser', params);
 };
 
-// Post 
+// Post
 export const getPosts = async () => {
 	return await apiClient.get('/post/getPosts');
 };

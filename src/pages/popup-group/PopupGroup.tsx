@@ -11,13 +11,23 @@ export const PopupGroup = (props: any) => {
 			width: '5%',
 			key: 'index',
 			className: 'text-center',
-			render: index => index + 1,
+			render: (a, b, index) => index + 1,
 		},
 		{
 			title: 'ID',
 			dataIndex: '_id',
 			key: '_id',
 			width: '150px',
+		},
+		{
+			title: 'ROLE',
+			dataIndex: 'role',
+			key: 'role',
+			width: '8%',
+			className: 'text-center',
+			render: role => {
+				return role?.charAt(0).toUpperCase() + role?.slice(1);
+			},
 		},
 		{
 			title: 'FIRST NAME',
@@ -30,31 +40,23 @@ export const PopupGroup = (props: any) => {
 			key: 'lname',
 		},
 		{
-			title: 'ROLE',
-			dataIndex: 'role',
-			key: 'role',
-			render: record => {
-				return record.role?.charAt(0).toUpperCase() + record.role?.slice(1);
-			},
-		},
-		{
 			title: 'TYPE',
-			dataIndex: 'role',
-			key: 'role',
-			render: record => {
-				return record.type?.charAt(0).toUpperCase() + record.type?.slice(1);
+			dataIndex: 'type',
+			key: 'type',
+			render: type => {
+				return type?.charAt(0).toUpperCase() + type?.slice(1);
 			},
 		},
 		{
 			title: 'STATUS',
 			key: 'status',
 			dataIndex: 'status',
-			width: '10%',
-			render: record => {
-				return record.status?.charAt(0).toUpperCase() + record.status?.slice(1);
+			width: '8%',
+			className: 'text-center',
+			render: status => {
+				return status?.charAt(0).toUpperCase() + status?.slice(1);
 			},
 		},
-
 		{
 			title: 'EMAIL',
 			dataIndex: 'email',
@@ -77,6 +79,9 @@ export const PopupGroup = (props: any) => {
 				footer={null}
 				width={'90%'}
 			>
+				<div className="mb-4 flex justify-end font-semibold">
+					Total: {dataItem?.groupUsers?.length | 0} Group users
+				</div>
 				<Table className="min-w-full" columns={columnsModalDetail} dataSource={dataItem?.groupUsers} bordered />
 			</Modal>
 		</div>
