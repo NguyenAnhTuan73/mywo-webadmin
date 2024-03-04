@@ -36,3 +36,21 @@ code {
 .ant-switch-checked {
 	background-color: #13ae81 !important;
 }
+
+.ant-pagination-item-active {
+	border-color: #13ae81 !important;
+	border-width: 2px !important;
+}
+
+.ant-pagination-item-active > a {
+	color: #13ae81 !important;
+}
+.ant-select-selection-item {
+	color: #13ae81 !important;
+}
+.ant-pagination-item:hover {
+	border-color: #13ae81 !important;
+}
+.ant-pagination-item > a:hover {
+	color: #13ae81 !important;
+}
