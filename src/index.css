@@ -48,7 +48,8 @@ code {
 .ant-select-selection-item {
 	color: #13ae81 !important;
 }
-.ant-pagination-item:hover {
+.ant-pagination-item:hover,
+.ant-input:hover {
 	border-color: #13ae81 !important;
 }
 .ant-pagination-item > a:hover {
