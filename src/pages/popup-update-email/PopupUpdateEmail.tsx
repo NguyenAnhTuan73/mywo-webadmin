@@ -1,8 +1,49 @@
-import { Modal } from 'antd';
-import React from 'react';
+import { Button, Form, Input, message, Modal } from 'antd';
+import { useEffect, useState } from 'react';
+import { changeEmailOfUser } from '../../service/auth/AuthService';
+
+
 
 export const PopupUpdateEmail = (props: any) => {
-	const { currentUser, isModalOpen, handleOk, handleCancel, dataToken } = props;
+	const { currentUser, isModalOpen, handleOk, handleCancel, dataToken, setStatusChangeEmail } = props;
+
+	const [valueEmail, setValueEmail] = useState(currentUser?.email || '');
+	const [errorMessage, setErrorMessage] = useState('');
+	useEffect(() => {
+		setValueEmail(currentUser?.email);
+	}, [currentUser, isModalOpen]);
+
+	const validateEmail = (email: string) => {
+		const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return regex.test(email);
+	};
+	const handleOnChange = (e: any) => {
+		const { value } = e.target;
+		setValueEmail(value);
+	};
+	const handleCancelModal = () => {
+		handleCancel();
+		setErrorMessage('');
+	};
+
+	const handleChangeEmail = async () => {
+		try {
+			if (validateEmail(valueEmail)) {
+				const res = await changeEmailOfUser({ email: valueEmail, code: currentUser.point_code });
+
+				if (!res.data.success) {
+					message.error(res.data.message);
+				} else {
+					message.success(res.data.message);
+					setStatusChangeEmail(true);
+					handleCancelModal();
+				}
+			} else {
+				setErrorMessage('Invalid email format');
+			}
+		} catch (error) {}
+	};
+	
 	return (
 		<div>
 			<Modal
@@ -17,13 +58,36 @@ export const PopupUpdateEmail = (props: any) => {
 				destroyOnClose={true}
 				visible={isModalOpen}
 				onOk={handleOk}
-				onCancel={handleCancel}
+				onCancel={handleCancelModal}
 				footer={null}
 				className="p-2 rounded-sm"
 				okButtonProps={{ style: { backgroundColor: '#13ae81', borderColor: '#13ae81' } }}
 			>
-				<div>
-					{/* Form update email go there */}
+				<div className="flex items-start w-full">
+					<h1 className="mb-0 mr-2">Email:</h1>
+					<div className="w-full flex-1">
+						<Form>
+							<Form.Item validateStatus={errorMessage ? 'error' : ''} help={errorMessage}>
+								<Input
+									className="w-full"
+									value={valueEmail}
+									onChange={handleOnChange}
+									type="email"
+									placeholder="Enter your email"
+								/>
+							</Form.Item>
+						</Form>
+					</div>
+				</div>
+				<div className="flex justify-center mt-10">
+					<Button
+						style={{ backgroundColor: '#13ae81', border: '#13ae81', borderRadius: '8px' }}
+						type="primary"
+						size="middle"
+						onClick={() => handleChangeEmail()}
+					>
+						Change
+					</Button>
 				</div>
 			</Modal>
 		</div>

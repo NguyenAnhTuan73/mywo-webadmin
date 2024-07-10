@@ -54,7 +54,7 @@ export default function ListUser() {
 
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
-
+	const [statusChangeMail, setStatusChangeEmail] = useState(false);
 	const [idUserActive, setIdUserActive] = useState('');
 	const [statusActiveUser, setStatusActiveUser] = useState('');
 
@@ -111,7 +111,7 @@ export default function ListUser() {
 	};
 	useEffect(() => {
 		getDataListUser(objParams);
-	}, [getAccessToken()]);
+	}, [getAccessToken(),statusChangeMail]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -141,6 +141,7 @@ export default function ListUser() {
 
 		setIsModalOpenChangeEmail(true);
 		setCurrentUser(item);
+		setStatusChangeEmail(false)
 	};
 
 	const handleOk = async () => {
@@ -460,6 +461,7 @@ export default function ListUser() {
 				isModalOpen={isModalOpenChangeEmail}
 				handleCancel={handleCancelToken}
 				currentUser={currentUser}
+				setStatusChangeEmail={setStatusChangeEmail}
 			/>
 		</>
 	);
