@@ -17,6 +17,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { getAccessToken } from '../../helper/tokenHelper';
 import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 import { PopupGetToken } from '../popup-get-token/PopupGetToken';
+import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
 import { userLoginByEmail } from '../../service/auth/AuthService';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
@@ -60,6 +61,7 @@ export default function ListUser() {
 	// show add point
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isModalOpenToken, setIsModalOpenToken] = useState(false);
+	const [isModalOpenChangeEmail, setIsModalOpenChangeEmail] = useState(false);
 
 	const [addPoint, setAddPoint] = useState('');
 	const [idUser, setIdUser] = useState('');
@@ -129,6 +131,18 @@ export default function ListUser() {
 		setCurrentUser(item);
 	};
 
+	const showModalChangeEmail = async (item: any) => {
+		// try {
+		// 	const resToken = await userLoginByEmail({ email: item?.email });
+		// 	setDataToken(resToken?.data);
+		// } catch (error) {
+		// 	setDataToken('');
+		// }
+
+		setIsModalOpenChangeEmail(true);
+		setCurrentUser(item);
+	};
+
 	const handleOk = async () => {
 		setIsModalOpen(false);
 		try {
@@ -150,6 +164,7 @@ export default function ListUser() {
 	};
 	const handleCancelToken = () => {
 		setIsModalOpenToken(false);
+		setIsModalOpenChangeEmail(false);
 	};
 	// total points user
 	// const viewsPointUser = (item: any) => {
@@ -276,6 +291,28 @@ export default function ListUser() {
 							onClick={() => showModalToken(item)}
 						>
 							Token
+						</Button>
+					</>
+				);
+			},
+		},
+
+		{
+			title: 'Change Email',
+			key: 'get_token',
+			dataIndex: 'get_token',
+			className: 'text-center ',
+			width: '9%',
+			render: (points, item) => {
+				return (
+					<>
+						<Button
+							style={{ backgroundColor: '#13ae81', border: '#13ae81' }}
+							type="primary"
+							size="middle"
+							onClick={() => showModalChangeEmail(item)}
+						>
+							Change
 						</Button>
 					</>
 				);
@@ -418,6 +455,11 @@ export default function ListUser() {
 				handleCancel={handleCancelToken}
 				currentUser={currentUser}
 				dataToken={dataToken}
+			/>
+			<PopupUpdateEmail
+				isModalOpen={isModalOpenChangeEmail}
+				handleCancel={handleCancelToken}
+				currentUser={currentUser}
 			/>
 		</>
 	);

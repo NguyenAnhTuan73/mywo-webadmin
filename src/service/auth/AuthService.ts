@@ -50,6 +50,12 @@ export const userResetPassword = async (params: any) => {
 export const userLoginByEmail = async (params: any) => {
 	return await apiClient.post('/users/login-by-email', params);
 };
+
+// changeEmailOfUser
+export const changeEmailOfUser = async (params: any) => {
+	return await apiClient.post('/admin/changeEmailOfUser', params);
+};
+
 export const adminAddPoint = async (params: any) => {
 	return await apiClient.post('/admin/adminAddPoint', params);
 };
