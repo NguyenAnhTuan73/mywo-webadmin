@@ -74,9 +74,12 @@
 		@include flex(stretch, flex-start);
 		flex-direction: column;
 		flex-grow: 1;
+		overflow-y: scroll;
 		@include mobile {
 			flex-grow: 0;
+			overflow-y: scroll;
 		}
+
 		&__item {
 			color: $mainColor;
 			@include flex(center, flex-start);

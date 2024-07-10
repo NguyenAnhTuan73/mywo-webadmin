@@ -49,14 +49,11 @@ const Sidebar = () => {
 		<>
 			<div className="sidebar w-1/3 shadow-xl ">
 				<div onClick={() => navigate('/dashboard')} className="sidebar__logo cursor-pointer">
-					<div className="flex justify-start items-center w-full">
+					<div className="flex justify-start items-center w-full lg:w-[100px]">
 						<img className="h-10 block pl-[5%] " src={images.logo} alt="" />
 						<span className="ml-2 text-white text-2xl font-semibold">MYWO</span>
 					</div>
-					<div
-						className="sidebar-close hover:text-red-600 duration-300 sm:mr-5 text-red"
-						onClick={closeSidebar}
-					>
+					<div className="sidebar-close hover:text-red-600 duration-300 text-red" onClick={closeSidebar}>
 						<i className="bx bx-x"></i>
 					</div>
 				</div>
