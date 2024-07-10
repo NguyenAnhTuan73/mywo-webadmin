@@ -79,6 +79,7 @@
 			flex-grow: 0;
 			overflow-y: scroll;
 		}
+
 		&__item {
 			color: $mainColor;
 			@include flex(center, flex-start);

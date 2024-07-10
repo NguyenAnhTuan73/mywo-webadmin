@@ -53,10 +53,7 @@ const Sidebar = () => {
 						<img className="h-10 block pl-[5%] " src={images.logo} alt="" />
 						<span className="ml-2 text-white text-2xl font-semibold">MYWO</span>
 					</div>
-					<div
-						className="sidebar-close hover:text-red-600 duration-300 sm:mr-5 text-red"
-						onClick={closeSidebar}
-					>
+					<div className="sidebar-close hover:text-red-600 duration-300 text-red" onClick={closeSidebar}>
 						<i className="bx bx-x"></i>
 					</div>
 				</div>

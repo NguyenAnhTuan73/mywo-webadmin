@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Space, Spin, Pagination, Input, Switch, Select, Button, Table } from 'antd';
+import { Space, Spin, Pagination, Input, Switch, Select, Button, Table, message } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { PaginationProps } from 'antd';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import _debounce from 'lodash/debounce';
 import _, { size } from 'lodash';
-import { getListUser } from '../../service/user/UserService';
+import { activeUser, getListUser } from '../../service/user/UserService';
 
 import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
@@ -19,6 +19,8 @@ import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 import { PopupGetToken } from '../popup-get-token/PopupGetToken';
 import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
 import { userLoginByEmail } from '../../service/auth/AuthService';
+import PopupAdd from '../popup-add/PopupAdd';
+import PopupStatusUser from '../popup-add/PopupAdd';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -34,6 +36,8 @@ export default function ListUser() {
 	const [currentUser, setCurrentUser] = useState<any>(null);
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
+	const [isModalVisibleVerified, setIsModalVisibleVerified] = useState(false);
+	const [statusChangeMail, setStatusChangeEmail] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams({
 		search: '',
 		page: '',
@@ -54,7 +58,7 @@ export default function ListUser() {
 
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
-	const [statusChangeMail, setStatusChangeEmail] = useState(false);
+	
 	const [idUserActive, setIdUserActive] = useState('');
 	const [statusActiveUser, setStatusActiveUser] = useState('');
 
@@ -372,9 +376,32 @@ export default function ListUser() {
 	};
 
 	const handleSwitchStatus = (paramsUuid: string, activeStatus: string) => {
+		console.log('check active', activeStatus);
 		setIsModalVisibleAdd(true);
 		setIdUserActive(paramsUuid);
 		setStatusActiveUser(activeStatus);
+	};
+
+	const handleCancelAdd = () => {
+		setIsModalVisibleAdd(false);
+		setIsModalVisibleVerified(false);
+	};
+
+	const handleOKAdd = async () => {
+		const objParamsId = {
+			user_id: idUserActive,
+			status: statusActiveUser === 'active' ? 'deactivate' : 'active',
+		};
+
+		const restActiver = await activeUser(objParamsId);
+		try {
+			getDataListUser(objParams);
+			setIsModalVisibleAdd(false);
+			message.success(restActiver.data.message);
+		} catch (error) {
+			console.log(error);
+			message.error(restActiver.data.message);
+		}
 	};
 
 	return (
@@ -444,7 +471,12 @@ export default function ListUser() {
 					/>
 				</div>
 			</div>
-
+			<PopupStatusUser
+				ModalVisibleAdd={isModalVisibleAdd}
+				handleCancelAdd={handleCancelAdd}
+				handleOKAdd={handleOKAdd}
+				statusActiveUser={statusActiveUser}
+			/>
 			<PopupGroupUsers
 				currentUser={currentUser}
 				handleOk={handleOk}
