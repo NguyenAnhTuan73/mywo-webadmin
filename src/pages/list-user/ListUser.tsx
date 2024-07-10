@@ -37,6 +37,7 @@ export default function ListUser() {
 	const [numberPage, setNumberPage] = useState(1);
 	const [numberLimit, setNumberLimit] = useState(10);
 	const [isModalVisibleVerified, setIsModalVisibleVerified] = useState(false);
+	const [statusChangeMail, setStatusChangeEmail] = useState(false);
 	const [searchParams, setSearchParams] = useSearchParams({
 		search: '',
 		page: '',
@@ -114,7 +115,7 @@ export default function ListUser() {
 	};
 	useEffect(() => {
 		getDataListUser(objParams);
-	}, [getAccessToken()]);
+	}, [getAccessToken(), statusChangeMail]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -491,6 +492,7 @@ export default function ListUser() {
 				isModalOpen={isModalOpenChangeEmail}
 				handleCancel={handleCancelToken}
 				currentUser={currentUser}
+				setStatusChangeEmail={setStatusChangeEmail}
 			/>
 		</>
 	);
