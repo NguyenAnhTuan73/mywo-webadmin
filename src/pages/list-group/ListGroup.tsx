@@ -54,14 +54,14 @@ export default function ListGroup() {
 		try {
 			setObjParams(objData);
 			const res = await getListGroups(objData);
+			console.log('🚀 ~ getDataListGroup ~ res:', res);
 
 			setIsSpin(false);
 			setblockDataGroups({
-				lengthUser: res.data.groups[0]?.metadata[0].total,
-				dataGroups: res.data.groups[0].data?.map((item: any, index: number) => {
+				lengthUser: res.data.total,
+				dataGroups: res.data.groups.map((item: any, index: number) => {
 					return {
 						...item,
-						index: index + 1,
 					};
 				}),
 			});
@@ -95,6 +95,7 @@ export default function ListGroup() {
 			key: 'index',
 			width: '5%',
 			className: 'text-center',
+			render: (text: string, record: any, index: number) => (pageValue - 1) * numberLimit + index + 1,
 		},
 
 		{
@@ -162,12 +163,17 @@ export default function ListGroup() {
 	const handleClickSearch = (e: any) => {
 		setIsSpin(true);
 		setFilterSearch(e.target.value);
-		getDataListGroup({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 0 });
+		getDataListGroup({
+			...objParams,
+			search: e.type === 'click' ? filterSearch : e.target.value,
+			page: 1,
+			size: sizeValue,
+		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: e.target.value,
-			page: `0`,
-			size: `10`,
+			page: `1`,
+			size: numberLimit.toString(),
 		});
 	};
 	const handleChange = (e: any) => {
@@ -241,7 +247,7 @@ export default function ListGroup() {
 							/>
 							<div className="flex justify-end mt-3 ">
 								<Pagination
-									current={numberPage}
+									current={pageValue}
 									showSizeChanger
 									defaultCurrent={1}
 									pageSize={numberLimit}
