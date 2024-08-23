@@ -4,6 +4,7 @@ import { DataType } from '../../interface/list-user/list_user.interface';
 
 export const PopupGroup = (props: any) => {
 	const { dataItem, isModalOpen, handleOk, handleCancel } = props;
+
 	const columnsModalDetail: ColumnsType<DataType> = [
 		{
 			title: 'No.',
@@ -17,14 +18,12 @@ export const PopupGroup = (props: any) => {
 			title: 'ID',
 			dataIndex: '_id',
 			key: '_id',
-			width: '150px',
 		},
 		{
 			title: 'ROLE',
 			dataIndex: 'role',
 			key: 'role',
-			width: '8%',
-			className: 'text-center',
+
 			render: role => {
 				return role?.charAt(0).toUpperCase() + role?.slice(1);
 			},
@@ -43,6 +42,7 @@ export const PopupGroup = (props: any) => {
 			title: 'TYPE',
 			dataIndex: 'type',
 			key: 'type',
+			className: 'text-center',
 			render: type => {
 				return type?.charAt(0).toUpperCase() + type?.slice(1);
 			},
@@ -61,6 +61,11 @@ export const PopupGroup = (props: any) => {
 			title: 'EMAIL',
 			dataIndex: 'email',
 			key: 'email',
+		},
+		{
+			title: 'LINK USER ID',
+			dataIndex: 'linkedUserId',
+			key: 'linkedUserId',
 		},
 	];
 	return (

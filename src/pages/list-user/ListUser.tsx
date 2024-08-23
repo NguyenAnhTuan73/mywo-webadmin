@@ -54,7 +54,7 @@ export default function ListUser() {
 
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
-
+	const [statusChangeMail, setStatusChangeEmail] = useState(false);
 	const [idUserActive, setIdUserActive] = useState('');
 	const [statusActiveUser, setStatusActiveUser] = useState('');
 
@@ -111,7 +111,7 @@ export default function ListUser() {
 	};
 	useEffect(() => {
 		getDataListUser(objParams);
-	}, [getAccessToken()]);
+	}, [getAccessToken(), setStatusChangeEmail]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -129,6 +129,7 @@ export default function ListUser() {
 
 		setIsModalOpenToken(true);
 		setCurrentUser(item);
+		setStatusChangeEmail(false);
 	};
 
 	const showModalChangeEmail = async (item: any) => {
@@ -411,36 +412,38 @@ export default function ListUser() {
 							/>
 						</div>
 					) : (
-						<Table
-							bordered
-							columns={columns}
-							scroll={{ x: 'max-content' }}
-							dataSource={blockDataUser.dataUser}
-							onChange={onChangePlan}
-							pagination={false}
-							locale={{
-								emptyText: (
-									<>
-										{spinValues ? (
-											<Spin indicator={antIcon} spinning={spinValues} />
-										) : (
-											<span className="italic font-medium  text-center">No data</span>
-										)}
-									</>
-								),
-							}}
-						/>
+						<>
+							<Table
+								bordered
+								columns={columns}
+								scroll={{ x: 'max-content' }}
+								dataSource={blockDataUser.dataUser}
+								onChange={onChangePlan}
+								pagination={false}
+								locale={{
+									emptyText: (
+										<>
+											{spinValues ? (
+												<Spin indicator={antIcon} spinning={spinValues} />
+											) : (
+												<span className="italic font-medium  text-center">No data</span>
+											)}
+										</>
+									),
+								}}
+							/>
+							<div className="flex justify-end mt-3 ">
+								<Pagination
+									current={Number(pageValue)}
+									showSizeChanger
+									defaultCurrent={1}
+									total={blockDataUser?.lengthUser}
+									onChange={onShowSizeChange}
+									locale={{ items_per_page: ' Users per page' }}
+								/>
+							</div>
+						</>
 					)}
-				</div>
-				<div className="flex justify-end mt-3 ">
-					<Pagination
-						current={Number(pageValue)}
-						showSizeChanger
-						defaultCurrent={1}
-						total={blockDataUser?.lengthUser}
-						onChange={onShowSizeChange}
-						locale={{ items_per_page: ' Users per page' }}
-					/>
 				</div>
 			</div>
 
@@ -460,6 +463,7 @@ export default function ListUser() {
 				isModalOpen={isModalOpenChangeEmail}
 				handleCancel={handleCancelToken}
 				currentUser={currentUser}
+				setStatusChangeEmail={setStatusChangeEmail}
 			/>
 		</>
 	);

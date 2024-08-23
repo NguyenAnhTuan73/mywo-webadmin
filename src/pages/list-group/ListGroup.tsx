@@ -15,28 +15,29 @@ import { PopupGroup } from '../popup-group/PopupGroup';
 
 export default function ListGroup() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
-	const [numberPage, setNumberPage] = useState(1);
-	const [numberLimit, setNumberLimit] = useState(10);
+
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const [currentGroups, setCurrentGroups] = useState<any>(null);
 	const [dataItem, setDataItem] = useState<any>(null);
 
 	const [isSpin, setIsSpin] = useState(true);
-	const [searchParams, setSearchParams] = useSearchParams({
-		search: '',
-		page: '',
-		size: '',
-		// status: '',
-	});
 	const params = new URLSearchParams(location.search);
 	const searchValue = params.get('search');
-	const pageValue = params.get('page') == null ? 0 : params.get('page');
-	const sizeValue = params.get('size') == null ? 10 : params.get('size');
+	const pageValue = params.get('page') == null ? 1 : Number(params.get('page'));
+	const sizeValue = params.get('size') == null ? 10 : Number(params.get('size'));
 	const [objParams, setObjParams] = useState({
 		search: searchValue,
 		page: pageValue,
 		size: sizeValue,
+		// status: '',
+	});
+	const [numberPage, setNumberPage] = useState(pageValue);
+	const [numberLimit, setNumberLimit] = useState(sizeValue);
+	const [searchParams, setSearchParams] = useSearchParams({
+		search: '',
+		page: '1',
+		size: '10',
 		// status: '',
 	});
 	const [blockDataGroups, setblockDataGroups] = useState<any>({ lengthUser: 0, dataGroups: [] });
@@ -60,7 +61,7 @@ export default function ListGroup() {
 				dataGroups: res.data.groups[0].data?.map((item: any, index: number) => {
 					return {
 						...item,
-						index: index + 1 + (objData.page - 1 < 0 ? 0 : objData.page) * numberLimit,
+						index: index + 1,
 					};
 				}),
 			});
@@ -141,6 +142,7 @@ export default function ListGroup() {
 	];
 
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
+		setIsSpin(true);
 		setNumberLimit(pageSize);
 		setNumberPage(current);
 		getDataListGroup({
@@ -160,7 +162,7 @@ export default function ListGroup() {
 	const handleClickSearch = (e: any) => {
 		setIsSpin(true);
 		setFilterSearch(e.target.value);
-		getDataListGroup({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+		getDataListGroup({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 0 });
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: e.target.value,
@@ -212,41 +214,44 @@ export default function ListGroup() {
 				</div>
 				<div className="overflow-hidden">
 					{isSpin ? (
-						<div className="w-full h-full flex justify-center items-center">
+						<div className="w-full h-[30vh] flex justify-center items-center">
 							<Spin
 								indicator={<LoadingOutlined style={{ fontSize: 32, color: '#13ae81' }} spin={isSpin} />}
 							/>
 						</div>
 					) : (
-						<Table
-							bordered
-							columns={columns}
-							scroll={{ x: 'max-content' }}
-							dataSource={blockDataGroups?.dataGroups}
-							pagination={false}
-							locale={{
-								emptyText: (
-									<>
-										{spinValues ? (
-											<Spin indicator={antIcon} spinning={spinValues} />
-										) : (
-											<span className="italic font-medium  text-center">No data</span>
-										)}
-									</>
-								),
-							}}
-						/>
+						<>
+							<Table
+								bordered
+								columns={columns}
+								scroll={{ x: 'max-content' }}
+								dataSource={blockDataGroups?.dataGroups}
+								pagination={false}
+								locale={{
+									emptyText: (
+										<>
+											{spinValues ? (
+												<Spin indicator={antIcon} spinning={spinValues} />
+											) : (
+												<span className="italic font-medium  text-center">No data</span>
+											)}
+										</>
+									),
+								}}
+							/>
+							<div className="flex justify-end mt-3 ">
+								<Pagination
+									current={numberPage}
+									showSizeChanger
+									defaultCurrent={1}
+									pageSize={numberLimit}
+									total={blockDataGroups?.lengthUser}
+									onChange={onShowSizeChange}
+									locale={{ items_per_page: ' Groups per page' }}
+								/>
+							</div>
+						</>
 					)}
-				</div>
-				<div className="flex justify-end mt-3 ">
-					<Pagination
-						current={Number(pageValue) === 0 ? 1 : Number(pageValue)}
-						showSizeChanger
-						defaultCurrent={1}
-						total={blockDataGroups?.lengthUser}
-						onChange={onShowSizeChange}
-						locale={{ items_per_page: ' Groups per page' }}
-					/>
 				</div>
 			</div>
 			<PopupGroup isModalOpen={isModalOpen} dataItem={dataItem} handleOk={handleOk} handleCancel={handleCancel} />
