@@ -117,7 +117,7 @@ export default function ListUser() {
 	useEffect(() => {
 		getDataListUser(objParams);
 
-	}, [getAccessToken(), setStatusChangeEmail, setStatusChangeUser]);
+	}, [getAccessToken(), statusChangeMail,]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -147,6 +147,7 @@ export default function ListUser() {
 		// }
 
 		setIsModalOpenChangeEmail(true);
+		setStatusChangeEmail(false);
 		setCurrentUser(item);
 	};
 
@@ -404,8 +405,7 @@ export default function ListUser() {
 				message.error(res.data.message);
 			} else {
 
-				message.success(res.data.message);
-				getDataListUser({
+				await getDataListUser({
 					...objParams,
 					page: pageValue,
 					size: sizeValue,
@@ -418,8 +418,9 @@ export default function ListUser() {
 					size: sizeValue.toString(),
 
 				});
-
 				handleCancel();
+				message.success(res.data.message);
+
 			}
 		} catch (error) {
 			setStatusChangeUser(false);
