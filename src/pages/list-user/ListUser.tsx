@@ -5,16 +5,15 @@ import type { PaginationProps } from 'antd';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import _debounce from 'lodash/debounce';
-import _, { size } from 'lodash';
+import _ from 'lodash';
 import { activeUser, getListUser } from '../../service/user/UserService';
 
 import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
 
-const { Option } = Select;
 import './ListUser.scss';
 import { LoadingOutlined } from '@ant-design/icons';
-import { getAccessToken } from '../../helper/tokenHelper';
+
 import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 import { PopupGetToken } from '../popup-get-token/PopupGetToken';
 import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
@@ -33,13 +32,7 @@ export default function ListUser() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [dataToken, setDataToken] = useState('');
 	const [currentUser, setCurrentUser] = useState<any>(null);
-	const [numberPage, setNumberPage] = useState(1);
-	const [numberLimit, setNumberLimit] = useState(10);
-	const [searchParams, setSearchParams] = useSearchParams({
-		search: '',
-		page: '1',
-		size: '10',
-	});
+
 	// reload current page
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -53,6 +46,13 @@ export default function ListUser() {
 		size: sizeValue,
 	});
 
+	const [numberPage, setNumberPage] = useState(pageValue);
+	const [numberLimit, setNumberLimit] = useState(sizeValue);
+	const [searchParams, setSearchParams] = useSearchParams({
+		search: '',
+		page: '1',
+		size: '10',
+	});
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
 	const [statusChangeMail, setStatusChangeEmail] = useState(false);
@@ -88,7 +88,7 @@ export default function ListUser() {
 	// click show modal add point
 	const getDataListUser = async (objData: any) => {
 		try {
-			// setIsSpin(true);
+
 			setSpinValues(true);
 			setObjParams(objData);
 			const res = await getListUser(objData);
@@ -114,10 +114,10 @@ export default function ListUser() {
 			setSpinValues(false);
 		}
 	};
-	useEffect(() => {
-		getDataListUser(objParams);
+	// useEffect(() => {
+	// 	getDataListUser(objParams);
 
-	}, [getAccessToken(), statusChangeMail,]);
+	// }, [getAccessToken(), statusChangeMail, objParams]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -338,18 +338,19 @@ export default function ListUser() {
 		// console.log('params', filters);
 	};
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
+		setIsSpin(true);
 		setNumberLimit(pageSize);
 		setNumberPage(current);
 		getDataListUser({
 			...objParams,
-			page: current,
+			page: numberPage === current ? 1 : current,
 			size: pageSize,
 			// status :
 		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: filterSearch,
-			page: current.toString(),
+			page: numberPage === current ? '1' : current.toString(),
 			size: pageSize.toString(),
 			// status:
 			// 	statusActive !== '' && statusActive !== 'null' && statusActive !== 'undefined'
@@ -359,28 +360,46 @@ export default function ListUser() {
 	};
 
 	const handleChange = (e: any) => {
-		setFilterSearch(e.target.value);
+
+		setFilterSearch(e.target.value.replace(/^\s+/, ''));
 		if (e.target.value === '') {
-			handleClickSearch(e);
+			setIsSpin(true);
+			getDataListUser({ ...objParams, search: '', })
+			setSearchParams({
+				...Object.fromEntries(searchParams.entries()),
+				search: '',
+
+			});
 		}
-		setFilterSearch(e.target.value);
+
+
 	};
 	// click seach
-	const handleClickSearch = (e: any) => {
-		setIsSpin(true);
-		getDataListUser({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+	const handleClickSearch = () => {
+		getDataListUser({ ...objParams, search: filterSearch, page: 1 });
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
-			search: e.target.value,
+			search: filterSearch,
 			page: `1`,
-			size: `10`,
+			size: numberLimit.toString(),
+
 		});
 	};
 	// Search
 	const handleEnterSearch = (event: any) => {
 		if (event.key === 'Enter') {
-			handleClickSearch(event);
-			return;
+			if (filterSearch !== '') {
+				setIsSpin(true);
+				getDataListUser({ ...objParams, search: filterSearch, page: 1 });
+				setSearchParams({
+					...Object.fromEntries(searchParams.entries()),
+					search: filterSearch,
+					page: `1`,
+					size: numberLimit.toString(),
+
+				});
+
+			}
 		}
 	};
 
@@ -400,7 +419,6 @@ export default function ListUser() {
 	const handleChangeStatusUser = async () => {
 		try {
 			const res = await activeUser(bodyChangeUser)
-
 			if (!res.data.success) {
 				message.error(res.data.message);
 			} else {
@@ -441,10 +459,10 @@ export default function ListUser() {
 							<Input
 								placeholder="Find users by..."
 								onChange={e => handleChange(e)}
-								onKeyDown={handleEnterSearch}
+								onKeyDown={handleEnterSearch} value={filterSearch}
 							/>
-							<Button type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
-								<div className="flex items-center" onClick={handleClickSearch}>
+							<Button disabled={isSpin || filterSearch === ''} type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
+								<div className="flex items-center" onClick={() => handleClickSearch()}>
 									<i className="bx bx-search text-base mr-1"></i>
 									<span>Search</span>
 								</div>
@@ -491,6 +509,7 @@ export default function ListUser() {
 									current={Number(pageValue)}
 									showSizeChanger
 									defaultCurrent={1}
+									pageSize={numberLimit}
 									total={blockDataUser?.lengthUser}
 									onChange={onShowSizeChange}
 									locale={{ items_per_page: ' Users per page' }}

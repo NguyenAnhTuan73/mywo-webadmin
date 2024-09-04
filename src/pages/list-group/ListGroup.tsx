@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Space, Table, Pagination, Input, Switch, Spin, Button, Modal } from 'antd';
+import { Table, Pagination, Input, Spin, Button } from 'antd';
 import type { PaginationProps } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -8,24 +8,19 @@ import _debounce from 'lodash/debounce';
 import _ from 'lodash';
 import { getListGroups } from '../../service/user/UserService';
 import { DataType } from '../../interface/list-user/list_user.interface';
-
-import { getAccessToken } from '../../helper/tokenHelper';
-
 import { PopupGroup } from '../popup-group/PopupGroup';
 
 export default function ListGroup() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
-
 	const [isModalOpen, setIsModalOpen] = useState(false);
-
 	const [currentGroups, setCurrentGroups] = useState<any>(null);
 	const [dataItem, setDataItem] = useState<any>(null);
 
-	const [isSpin, setIsSpin] = useState(true);
+	const [isSpin, setIsSpin] = useState(false);
 	const params = new URLSearchParams(location.search);
-	const searchValue = params.get('search');
-	const pageValue = params.get('page') == null ? 1 : Number(params.get('page'));
-	const sizeValue = params.get('size') == null ? 10 : Number(params.get('size'));
+	const searchValue = params.get('search') ?? '';
+	const pageValue: number = Number(params.get('page')) || 1; // Default to 1 if not a number
+	const sizeValue: number = Number(params.get('size')) || 10; // Default to 10 if not a number
 	const [objParams, setObjParams] = useState({
 		search: searchValue,
 		page: pageValue,
@@ -45,9 +40,9 @@ export default function ListGroup() {
 	// loading
 	const [spinValues, setSpinValues] = useState(false);
 	const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-	useEffect(() => {
-		getDataListGroup(objParams);
-	}, [getAccessToken()]);
+	// useEffect(() => {
+	// 	getDataListGroup(objParams);
+	// }, [getAccessToken()]);
 
 	const getDataListGroup = async (objData: any) => {
 		setSpinValues(true);
@@ -146,47 +141,69 @@ export default function ListGroup() {
 		setIsSpin(true);
 		setNumberLimit(pageSize);
 		setNumberPage(current);
+
 		getDataListGroup({
 			...objParams,
-			page: current - 1,
+			page: numberPage === current ? 1 : current,
 			size: pageSize,
 		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: filterSearch,
-			page: current.toString(),
+			page: numberPage === current ? '1' : current.toString(),
 			size: pageSize.toString(),
 		});
 	};
 
 	// click seach
-	const handleClickSearch = (e: any) => {
-		setIsSpin(true);
-		setFilterSearch(e.target.value);
+	const handleClickSearch = () => {
 		getDataListGroup({
 			...objParams,
-			search: e.type === 'click' ? filterSearch : e.target.value,
+			search: filterSearch,
 			page: 1,
-			size: sizeValue,
+
 		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
-			search: e.target.value,
+			search: filterSearch,
 			page: `1`,
 			size: numberLimit.toString(),
 		});
 	};
 	const handleChange = (e: any) => {
-		setFilterSearch(e.target.value);
+		setFilterSearch(e.target.value.replace(/^\s+/, ''));
 		if (e.target.value === '') {
-			handleClickSearch(e);
+			setIsSpin(true);
+
+			getDataListGroup({
+				...objParams,
+				search: '',
+			});
+			setSearchParams({
+				...Object.fromEntries(searchParams.entries()),
+				search: '',
+			});
 		}
-		setFilterSearch(e.target.value);
+
 	};
 	const handleEnterSearch = (event: any) => {
 		if (event.key === 'Enter') {
-			handleClickSearch(event);
-			return;
+			if (filterSearch !== '') {
+				setIsSpin(true);
+				getDataListGroup({
+					...objParams,
+					search: filterSearch,
+					page: 1,
+
+				});
+				setSearchParams({
+					...Object.fromEntries(searchParams.entries()),
+					search: filterSearch,
+					page: `1`,
+					size: numberLimit.toString(),
+				});
+
+			}
 		}
 	};
 
@@ -202,9 +219,10 @@ export default function ListGroup() {
 								placeholder="Find groups by..."
 								onChange={e => handleChange(e)}
 								onKeyDown={handleEnterSearch}
+								value={filterSearch}
 							/>
-							<Button type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
-								<div className="flex items-center" onClick={handleClickSearch}>
+							<Button disabled={isSpin || filterSearch === ''} type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
+								<div className="flex items-center" onClick={() => handleClickSearch()}>
 									<i className="bx bx-search text-base mr-1"></i>
 									<span>Search</span>
 								</div>
