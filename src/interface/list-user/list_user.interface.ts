@@ -41,3 +41,8 @@ export interface TypeDataUser {
 	status: any;
 	auth_type: string;
 }
+
+export interface TypeBodyChangeStatus {
+	user_id: string;
+	status: string
+}

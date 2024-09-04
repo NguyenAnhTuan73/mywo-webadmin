@@ -1,7 +1,7 @@
 import apiClient from '../../config/apiClient';
 import { deleteAccessToken, setAccessToken, setToken } from '../../helper/tokenHelper';
 import { configApp } from '../../config/config';
-import { TypeObjParams } from '../../interface/list-user/list_user.interface';
+import { TypeBodyChangeStatus, TypeObjParams } from '../../interface/list-user/list_user.interface';
 var qs = require('querystringify');
 
 export const getDashboard = async () => {
@@ -47,8 +47,8 @@ export const getListDevice = async (params: TypeObjParams) => {
 	return await apiClient.get(`/admin/getDevices?${objParamUrls}`);
 };
 
-export const activeUser = async (objParamsId: any) => {
-	return await apiClient.post(`/admin/activeUser`, objParamsId);
+export const activeUser = async (body: TypeBodyChangeStatus) => {
+	return await apiClient.post(`/admin/active-user`, body);
 };
 
 export const verifiedEmailUser = async (objParamsId: any) => {

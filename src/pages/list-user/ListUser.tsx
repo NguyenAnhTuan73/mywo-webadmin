@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Space, Spin, Pagination, Input, Switch, Select, Button, Table } from 'antd';
+import { Space, Spin, Pagination, Input, Switch, Select, Button, Table, message } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { PaginationProps } from 'antd';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import _debounce from 'lodash/debounce';
 import _, { size } from 'lodash';
-import { getListUser } from '../../service/user/UserService';
+import { activeUser, getListUser } from '../../service/user/UserService';
 
 import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
@@ -19,6 +19,7 @@ import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 import { PopupGetToken } from '../popup-get-token/PopupGetToken';
 import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
 import { userLoginByEmail } from '../../service/auth/AuthService';
+import PopupChangeStatusUser from './popupChangeStatus';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -36,15 +37,15 @@ export default function ListUser() {
 	const [numberLimit, setNumberLimit] = useState(10);
 	const [searchParams, setSearchParams] = useSearchParams({
 		search: '',
-		page: '',
-		size: '',
+		page: '1',
+		size: '10',
 	});
 	// reload current page
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
-	const searchValue = params.get('search') == null ? '' : params.get('search');
-	const pageValue = params.get('page') == null ? 1 : params.get('page');
-	const sizeValue = params.get('size') == null ? 10 : params.get('size');
+	const searchValue: string = params.get('search') ?? ''; // Default to an empty string
+	const pageValue: number = Number(params.get('page')) || 1; // Default to 1 if not a number
+	const sizeValue: number = Number(params.get('size')) || 10; // Default to 10 if not a number
 
 	const [objParams, setObjParams] = useState<YourInterface>({
 		search: searchValue,
@@ -55,18 +56,22 @@ export default function ListUser() {
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
 	const [statusChangeMail, setStatusChangeEmail] = useState(false);
+	const [statusChangeUser, setStatusChangeUser] = useState(false);
 	const [idUserActive, setIdUserActive] = useState('');
 	const [statusActiveUser, setStatusActiveUser] = useState('');
+	const [bodyChangeUser, setBodyChangeUser] = useState({ user_id: '', status: '' })
 
 	// show add point
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isModalOpenToken, setIsModalOpenToken] = useState(false);
+	const [isModalOpenActiveUser, setIsModalOpenActiveUser] = useState(false);
 	const [isModalOpenChangeEmail, setIsModalOpenChangeEmail] = useState(false);
 
 	const [addPoint, setAddPoint] = useState('');
 	const [idUser, setIdUser] = useState('');
 	const [isSpin, setIsSpin] = useState(false);
 	const [spinValues, setSpinValues] = useState(false);
+	const [loading, setLoading] = useState(false)
 	const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 	// lodash
@@ -111,7 +116,8 @@ export default function ListUser() {
 	};
 	useEffect(() => {
 		getDataListUser(objParams);
-	}, [getAccessToken(), setStatusChangeEmail]);
+
+	}, [getAccessToken(), setStatusChangeEmail, setStatusChangeUser]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -162,11 +168,14 @@ export default function ListUser() {
 
 	const handleCancel = () => {
 		setIsModalOpen(false);
+		setIsModalOpenActiveUser(false);
+
 	};
 	const handleCancelToken = () => {
 		setIsModalOpenToken(false);
 		setIsModalOpenChangeEmail(false);
 	};
+
 	// total points user
 	// const viewsPointUser = (item: any) => {
 	//     // const filtered = item.points.filter((item: any, index: any) => item.id === index.id);
@@ -226,16 +235,19 @@ export default function ListUser() {
 			key: 'status',
 			className: 'text-center',
 			width: '5%',
-			render: (_, record) => (
-				<Space size="middle">
-					<Switch
-						checked={record.status === 'active'}
-						onChange={() => {
-							handleSwitchStatus(record['_id'], record.status);
-						}}
-					/>
-				</Space>
-			),
+			render: (_, record) => {
+
+				return (
+					<Space size="middle">
+						<Switch
+							checked={record.status === 'active'}
+							onChange={() => {
+								handleSwitchStatus(record['_id'], record.status);
+							}}
+						/>
+					</Space>
+				)
+			}
 		},
 		{
 			title: 'AUTH TYPE',
@@ -372,10 +384,51 @@ export default function ListUser() {
 	};
 
 	const handleSwitchStatus = (paramsUuid: string, activeStatus: string) => {
+		setStatusChangeUser(false);
+
+		setBodyChangeUser({ ...bodyChangeUser, user_id: paramsUuid, status: activeStatus === 'active' ? 'deactivate' : 'active' })
+
+
+		setIsModalOpenActiveUser(true)
 		setIsModalVisibleAdd(true);
 		setIdUserActive(paramsUuid);
 		setStatusActiveUser(activeStatus);
 	};
+
+
+	const handleChangeStatusUser = async () => {
+		try {
+			const res = await activeUser(bodyChangeUser)
+
+			if (!res.data.success) {
+				message.error(res.data.message);
+			} else {
+
+				message.success(res.data.message);
+				getDataListUser({
+					...objParams,
+					page: pageValue,
+					size: sizeValue,
+					search: searchValue
+				});
+				setSearchParams({
+					...Object.fromEntries(searchParams.entries()),
+					search: filterSearch,
+					page: pageValue.toString(),
+					size: sizeValue.toString(),
+
+				});
+
+				handleCancel();
+			}
+		} catch (error) {
+			setStatusChangeUser(false);
+
+		}
+
+	}
+
+
 
 	return (
 		<>
@@ -465,6 +518,7 @@ export default function ListUser() {
 				currentUser={currentUser}
 				setStatusChangeEmail={setStatusChangeEmail}
 			/>
+			<PopupChangeStatusUser isModalOpen={isModalOpenActiveUser} handleCancel={handleCancel} body={bodyChangeUser} handleOK={handleChangeStatusUser} />
 		</>
 	);
 }
