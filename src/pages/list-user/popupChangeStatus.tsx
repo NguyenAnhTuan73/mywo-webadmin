@@ -4,7 +4,7 @@ import '../popup-logout/PopupLogout.scss';
 import { activeUser } from '../../service/user/UserService';
 
 export default function PopupChangeStatusUser(props: any) {
-    const { ModalVisible, handleCancel, handleOK, isModalOpen, } = props;
+    const { ModalVisible, handleCancel, handleOK, isModalOpen, statusActiveUser } = props;
     const [isSpin, setIsSpin] = useState(false);
 
     return (
@@ -20,18 +20,16 @@ export default function PopupChangeStatusUser(props: any) {
                     okButtonProps={{ style: { backgroundColor: '#13ae81', borderColor: '#13ae81' } }}
                     className="round-sm text-center"
                     centered
+                    title="STATUS USER"
                 >
-                    <p className="text-center ">Are you sure you want to change this user's status?</p>
-                    {/* <div className="flex justify-center mt-10">
-                        <Button
-                            style={{ backgroundColor: '#13ae81', border: '#13ae81', borderRadius: '8px' }}
-                            type="primary"
-                            size="middle"
-                            onClick={() => handleChangeStatusUser()}
-                        >
-                            Change
-                        </Button>
-                    </div> */}
+                    {statusActiveUser === 'active' ? (
+                        <p className="text-center text-red-600 text-[1.2rem]">
+                            Do you want to deactivate this account?
+                        </p>
+                    ) : (
+                        <p className="text-center text-red-600 text-[1.2rem]">Do you want to activate this account?</p>
+                    )}
+
                 </Modal>
             </Spin>
         </div>

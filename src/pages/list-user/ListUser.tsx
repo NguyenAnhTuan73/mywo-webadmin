@@ -173,6 +173,7 @@ export default function ListUser() {
 		setIsModalOpen(false);
 		setIsModalOpenActiveUser(false);
 
+
 	};
 	const handleCancelToken = () => {
 		setIsModalOpenToken(false);
@@ -542,12 +543,12 @@ export default function ListUser() {
 					)}
 				</div>
 			</div>
-			<PopupStatusUser
+			{/* <PopupStatusUser
 				ModalVisibleAdd={isModalVisibleAdd}
 				handleCancelAdd={handleCancelAdd}
 				handleOKAdd={handleOKAdd}
 				statusActiveUser={statusActiveUser}
-			/>
+			/> */}
 			<PopupGroupUsers
 				currentUser={currentUser}
 				handleOk={handleOk}
@@ -566,7 +567,7 @@ export default function ListUser() {
 				currentUser={currentUser}
 				setStatusChangeEmail={setStatusChangeEmail}
 			/>
-			<PopupChangeStatusUser isModalOpen={isModalOpenActiveUser} handleCancel={handleCancel} body={bodyChangeUser} handleOK={handleChangeStatusUser} />
+			<PopupChangeStatusUser isModalOpen={isModalOpenActiveUser} handleCancel={handleCancel} body={bodyChangeUser} handleOK={handleChangeStatusUser} statusActiveUser={statusActiveUser} />
 		</>
 	);
 }
