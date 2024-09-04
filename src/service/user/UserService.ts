@@ -1,7 +1,6 @@
 import apiClient from '../../config/apiClient';
-import { deleteAccessToken, setAccessToken, setToken } from '../../helper/tokenHelper';
-import { configApp } from '../../config/config';
 import { TypeBodyChangeStatus, TypeObjParams } from '../../interface/list-user/list_user.interface';
+
 var qs = require('querystringify');
 
 export const getDashboard = async () => {

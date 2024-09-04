@@ -19,6 +19,8 @@ import { PopupGetToken } from '../popup-get-token/PopupGetToken';
 import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
 import { userLoginByEmail } from '../../service/auth/AuthService';
 import PopupChangeStatusUser from './popupChangeStatus';
+import PopupAdd from '../popup-add/PopupAdd';
+import PopupStatusUser from '../popup-add/PopupAdd';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -32,7 +34,6 @@ export default function ListUser() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [dataToken, setDataToken] = useState('');
 	const [currentUser, setCurrentUser] = useState<any>(null);
-
 	// reload current page
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
@@ -149,6 +150,7 @@ export default function ListUser() {
 		setIsModalOpenChangeEmail(true);
 		setStatusChangeEmail(false);
 		setCurrentUser(item);
+		setStatusChangeEmail(false)
 	};
 
 	const handleOk = async () => {
@@ -448,6 +450,27 @@ export default function ListUser() {
 	}
 
 
+	const handleCancelAdd = () => {
+		setIsModalVisibleAdd(false);
+
+	};
+
+	const handleOKAdd = async () => {
+		const objParamsId = {
+			user_id: idUserActive,
+			status: statusActiveUser === 'active' ? 'deactivate' : 'active',
+		};
+
+		const restActiver = await activeUser(objParamsId);
+		try {
+			getDataListUser(objParams);
+			setIsModalVisibleAdd(false);
+			message.success(restActiver.data.message);
+		} catch (error) {
+			console.log(error);
+			message.error(restActiver.data.message);
+		}
+	};
 
 	return (
 		<>
@@ -519,7 +542,12 @@ export default function ListUser() {
 					)}
 				</div>
 			</div>
-
+			<PopupStatusUser
+				ModalVisibleAdd={isModalVisibleAdd}
+				handleCancelAdd={handleCancelAdd}
+				handleOKAdd={handleOKAdd}
+				statusActiveUser={statusActiveUser}
+			/>
 			<PopupGroupUsers
 				currentUser={currentUser}
 				handleOk={handleOk}

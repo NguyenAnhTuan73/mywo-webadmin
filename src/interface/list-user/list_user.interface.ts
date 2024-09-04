@@ -27,6 +27,10 @@ export interface TypeObjParams {
 	page?: number;
 	size?: number;
 }
+export interface TypeObjParamsStatusUser {
+	user_id: string;
+	status: string;
+}
 
 export interface TypeSelect {
 	title: string;
