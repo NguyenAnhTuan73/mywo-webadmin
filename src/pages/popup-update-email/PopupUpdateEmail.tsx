@@ -28,18 +28,19 @@ export const PopupUpdateEmail = (props: any) => {
 		try {
 			if (validateEmail(valueEmail)) {
 				const res = await changeEmailOfUser({ email: valueEmail, code: currentUser.point_code });
+				console.log("🚀 ~ handleChangeEmail ~ res:", res)
 
-				if (!res.data.success) {
+				if (!res.data) {
 					message.error(res.data.message);
 				} else {
-					message.success(res.data.message);
 					setStatusChangeEmail(true);
+					message.success(res.data.message);
 					handleCancelModal();
 				}
 			} else {
 				setErrorMessage('Invalid email format');
 			}
-		} catch (error) {}
+		} catch (error) { }
 	};
 
 	return (

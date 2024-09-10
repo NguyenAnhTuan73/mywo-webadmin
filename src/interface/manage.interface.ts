@@ -7,6 +7,7 @@ export interface TypeStatus {
 export interface TypeData {
 	numFamily?: number;
 	numUser: number;
+	totalNewUsers: number;
 	userOfDate: any;
 	numGroup: number;
 }

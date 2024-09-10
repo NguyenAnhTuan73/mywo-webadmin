@@ -27,6 +27,10 @@ export interface TypeObjParams {
 	page?: number;
 	size?: number;
 }
+export interface TypeObjParamsStatusUser {
+	user_id: string;
+	status: string;
+}
 
 export interface TypeSelect {
 	title: string;
@@ -40,4 +44,9 @@ export interface TypeDataUser {
 	email: string;
 	status: any;
 	auth_type: string;
+}
+
+export interface TypeBodyChangeStatus {
+	user_id: string;
+	status: string
 }
