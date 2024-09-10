@@ -14,7 +14,8 @@ export default function DashBoard() {
 	const [dashboarDisplay, setDashboarDisplay] = useState<TypeData>({
 		numGroup: 0,
 		numUser: 0,
-		userOfDate: {},
+		totalNewUsers: 0,
+		userOfDate: [],
 	});
 
 	const [vnpStatus, setVnpStatus] = useState(false);
@@ -27,6 +28,7 @@ export default function DashBoard() {
 			setDashboarDisplay({
 				numGroup: res.data.results.numGroup,
 				numUser: res.data.results.numUser,
+				totalNewUsers: res.data.results.totalNewUsers,
 				userOfDate: res.data.results.userOfDate,
 			});
 
@@ -45,23 +47,11 @@ export default function DashBoard() {
 	}, [getAccessToken()]);
 
 	const [isSpin, setIsSpin] = useState(true);
-	let data = [];
-	let total = 0;
-	for (var key of Object.keys(dashboarDisplay.userOfDate)) {
-		total += dashboarDisplay.userOfDate[key].length;
-
-		let dt = {
-			dayValue: new Date(key).getTime(),
-			day: moment(key).format('DD-MM'),
-			value: dashboarDisplay.userOfDate[key].length,
-		};
-		if (dt.value > 0) {
-			data.push(dt as any);
-		}
-	}
-
-	data.sort((a: any, b: any) => a.dayValue - b.dayValue);
-
+	const result = Object.entries(dashboarDisplay.userOfDate).map(([date, value]) => {
+		const [year, month, day] = date.split("-");
+		return { day: `${day}-${month}`, value: value };
+	});
+	const data = result
 	const config: any = {
 		data,
 		xField: 'day',
@@ -135,7 +125,7 @@ export default function DashBoard() {
 							</div>
 							<div className="w-1/3 sm:w-full flex items-center sm:bock sm:text-center sm:flex-col">
 								<TeamOutlined className="image-dashboard mr-3 " />
-								<p className="mb-0 text-[1rem] font-medium">{total} New Users </p>
+								<p className="mb-0 text-[1rem] font-medium">{dashboarDisplay.totalNewUsers} New Users </p>
 							</div>
 						</div>
 					</div>

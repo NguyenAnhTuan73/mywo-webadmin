@@ -13,6 +13,8 @@
 
 	&__content {
 		min-height: 100vh;
+		height: 100%;
+		overflow-y: scroll;
 		padding: $spacing-tb;
 		transition: all 0.5s ease-in-out;
 		// background-image: url('../assets/images/background.svg');

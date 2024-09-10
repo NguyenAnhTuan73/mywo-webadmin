@@ -1,24 +1,26 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Space, Spin, Pagination, Input, Switch, Select, Button, Table } from 'antd';
+import { Space, Spin, Pagination, Input, Switch, Select, Button, Table, message } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { PaginationProps } from 'antd';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import _debounce from 'lodash/debounce';
-import _, { size } from 'lodash';
-import { getListUser } from '../../service/user/UserService';
+import _ from 'lodash';
+import { activeUser, getListUser } from '../../service/user/UserService';
 
 import { DataType } from '../../interface/list-user/list_user.interface';
 import { TypeDataAddPointUser } from '../../interface/auth/auth.interface';
 
-const { Option } = Select;
 import './ListUser.scss';
 import { LoadingOutlined } from '@ant-design/icons';
-import { getAccessToken } from '../../helper/tokenHelper';
+
 import PopupGroupUsers from '../popup-group-users/PopupGroupUsers';
 import { PopupGetToken } from '../popup-get-token/PopupGetToken';
 import { PopupUpdateEmail } from '../popup-update-email/PopupUpdateEmail';
 import { userLoginByEmail } from '../../service/auth/AuthService';
+import PopupChangeStatusUser from './popupChangeStatus';
+import PopupAdd from '../popup-add/PopupAdd';
+import PopupStatusUser from '../popup-add/PopupAdd';
 
 export const blockInvalidChar = (e: any) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
@@ -32,19 +34,12 @@ export default function ListUser() {
 	const [filterSearch, setFilterSearch] = useState<string>('');
 	const [dataToken, setDataToken] = useState('');
 	const [currentUser, setCurrentUser] = useState<any>(null);
-	const [numberPage, setNumberPage] = useState(1);
-	const [numberLimit, setNumberLimit] = useState(10);
-	const [searchParams, setSearchParams] = useSearchParams({
-		search: '',
-		page: '',
-		size: '',
-	});
 	// reload current page
 	const location = useLocation();
 	const params = new URLSearchParams(location.search);
-	const searchValue = params.get('search') == null ? '' : params.get('search');
-	const pageValue = params.get('page') == null ? 1 : params.get('page');
-	const sizeValue = params.get('size') == null ? 10 : params.get('size');
+	const searchValue: string = params.get('search') ?? ''; // Default to an empty string
+	const pageValue: number = Number(params.get('page')) || 1; // Default to 1 if not a number
+	const sizeValue: number = Number(params.get('size')) || 10; // Default to 10 if not a number
 
 	const [objParams, setObjParams] = useState<YourInterface>({
 		search: searchValue,
@@ -52,21 +47,32 @@ export default function ListUser() {
 		size: sizeValue,
 	});
 
+	const [numberPage, setNumberPage] = useState(pageValue);
+	const [numberLimit, setNumberLimit] = useState(sizeValue);
+	const [searchParams, setSearchParams] = useSearchParams({
+		search: '',
+		page: '1',
+		size: '10',
+	});
 	const [blockDataUser, setBlockDataUser] = useState<any>({ lengthUser: 0, dataUser: [] });
 	const [isModalVisibleAdd, setIsModalVisibleAdd] = useState(false);
 	const [statusChangeMail, setStatusChangeEmail] = useState(false);
+	const [statusChangeUser, setStatusChangeUser] = useState(false);
 	const [idUserActive, setIdUserActive] = useState('');
 	const [statusActiveUser, setStatusActiveUser] = useState('');
+	const [bodyChangeUser, setBodyChangeUser] = useState({ user_id: '', status: '' })
 
 	// show add point
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isModalOpenToken, setIsModalOpenToken] = useState(false);
+	const [isModalOpenActiveUser, setIsModalOpenActiveUser] = useState(false);
 	const [isModalOpenChangeEmail, setIsModalOpenChangeEmail] = useState(false);
 
 	const [addPoint, setAddPoint] = useState('');
 	const [idUser, setIdUser] = useState('');
 	const [isSpin, setIsSpin] = useState(false);
 	const [spinValues, setSpinValues] = useState(false);
+	const [loading, setLoading] = useState(false)
 	const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 	// lodash
@@ -83,7 +89,7 @@ export default function ListUser() {
 	// click show modal add point
 	const getDataListUser = async (objData: any) => {
 		try {
-			// setIsSpin(true);
+
 			setSpinValues(true);
 			setObjParams(objData);
 			const res = await getListUser(objData);
@@ -109,9 +115,10 @@ export default function ListUser() {
 			setSpinValues(false);
 		}
 	};
-	useEffect(() => {
-		getDataListUser(objParams);
-	}, [getAccessToken(), setStatusChangeEmail]);
+	// useEffect(() => {
+	// 	getDataListUser(objParams);
+
+	// }, [getAccessToken(), statusChangeMail, objParams]);
 
 	const showModal = (item: any) => {
 		setIsModalOpen(true);
@@ -141,7 +148,9 @@ export default function ListUser() {
 		// }
 
 		setIsModalOpenChangeEmail(true);
+		setStatusChangeEmail(false);
 		setCurrentUser(item);
+		setStatusChangeEmail(false)
 	};
 
 	const handleOk = async () => {
@@ -162,11 +171,15 @@ export default function ListUser() {
 
 	const handleCancel = () => {
 		setIsModalOpen(false);
+		setIsModalOpenActiveUser(false);
+
+
 	};
 	const handleCancelToken = () => {
 		setIsModalOpenToken(false);
 		setIsModalOpenChangeEmail(false);
 	};
+
 	// total points user
 	// const viewsPointUser = (item: any) => {
 	//     // const filtered = item.points.filter((item: any, index: any) => item.id === index.id);
@@ -226,16 +239,19 @@ export default function ListUser() {
 			key: 'status',
 			className: 'text-center',
 			width: '5%',
-			render: (_, record) => (
-				<Space size="middle">
-					<Switch
-						checked={record.status === 'active'}
-						onChange={() => {
-							handleSwitchStatus(record['_id'], record.status);
-						}}
-					/>
-				</Space>
-			),
+			render: (_, record) => {
+
+				return (
+					<Space size="middle">
+						<Switch
+							checked={record.status === 'active'}
+							onChange={() => {
+								handleSwitchStatus(record['_id'], record.status);
+							}}
+						/>
+					</Space>
+				)
+			}
 		},
 		{
 			title: 'AUTH TYPE',
@@ -325,18 +341,19 @@ export default function ListUser() {
 		// console.log('params', filters);
 	};
 	const onShowSizeChange: PaginationProps['onShowSizeChange'] = (current, pageSize) => {
+		setIsSpin(true);
 		setNumberLimit(pageSize);
 		setNumberPage(current);
 		getDataListUser({
 			...objParams,
-			page: current,
+			page: numberPage === current ? 1 : current,
 			size: pageSize,
 			// status :
 		});
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
 			search: filterSearch,
-			page: current.toString(),
+			page: numberPage === current ? '1' : current.toString(),
 			size: pageSize.toString(),
 			// status:
 			// 	statusActive !== '' && statusActive !== 'null' && statusActive !== 'undefined'
@@ -346,35 +363,114 @@ export default function ListUser() {
 	};
 
 	const handleChange = (e: any) => {
-		setFilterSearch(e.target.value);
+
+		setFilterSearch(e.target.value.replace(/^\s+/, ''));
 		if (e.target.value === '') {
-			handleClickSearch(e);
+			setIsSpin(true);
+			getDataListUser({ ...objParams, search: '', })
+			setSearchParams({
+				...Object.fromEntries(searchParams.entries()),
+				search: '',
+
+			});
 		}
-		setFilterSearch(e.target.value);
+
+
 	};
 	// click seach
-	const handleClickSearch = (e: any) => {
-		setIsSpin(true);
-		getDataListUser({ ...objParams, search: e.type === 'click' ? filterSearch : e.target.value, page: 1 });
+	const handleClickSearch = () => {
+		getDataListUser({ ...objParams, search: filterSearch, page: 1 });
 		setSearchParams({
 			...Object.fromEntries(searchParams.entries()),
-			search: e.target.value,
+			search: filterSearch,
 			page: `1`,
-			size: `10`,
+			size: numberLimit.toString(),
+
 		});
 	};
 	// Search
 	const handleEnterSearch = (event: any) => {
 		if (event.key === 'Enter') {
-			handleClickSearch(event);
-			return;
+			if (filterSearch !== '') {
+				setIsSpin(true);
+				getDataListUser({ ...objParams, search: filterSearch, page: 1 });
+				setSearchParams({
+					...Object.fromEntries(searchParams.entries()),
+					search: filterSearch,
+					page: `1`,
+					size: numberLimit.toString(),
+
+				});
+
+			}
 		}
 	};
 
 	const handleSwitchStatus = (paramsUuid: string, activeStatus: string) => {
+		setStatusChangeUser(false);
+
+		setBodyChangeUser({ ...bodyChangeUser, user_id: paramsUuid, status: activeStatus === 'active' ? 'deactivate' : 'active' })
+
+
+		setIsModalOpenActiveUser(true)
 		setIsModalVisibleAdd(true);
 		setIdUserActive(paramsUuid);
 		setStatusActiveUser(activeStatus);
+	};
+
+
+	const handleChangeStatusUser = async () => {
+		try {
+			const res = await activeUser(bodyChangeUser)
+			if (!res.data.success) {
+				message.error(res.data.message);
+			} else {
+
+				await getDataListUser({
+					...objParams,
+					page: pageValue,
+					size: sizeValue,
+					search: searchValue
+				});
+				setSearchParams({
+					...Object.fromEntries(searchParams.entries()),
+					search: filterSearch,
+					page: pageValue.toString(),
+					size: sizeValue.toString(),
+
+				});
+				handleCancel();
+				message.success(res.data.message);
+
+			}
+		} catch (error) {
+			setStatusChangeUser(false);
+
+		}
+
+	}
+
+
+	const handleCancelAdd = () => {
+		setIsModalVisibleAdd(false);
+
+	};
+
+	const handleOKAdd = async () => {
+		const objParamsId = {
+			user_id: idUserActive,
+			status: statusActiveUser === 'active' ? 'deactivate' : 'active',
+		};
+
+		const restActiver = await activeUser(objParamsId);
+		try {
+			getDataListUser(objParams);
+			setIsModalVisibleAdd(false);
+			message.success(restActiver.data.message);
+		} catch (error) {
+			console.log(error);
+			message.error(restActiver.data.message);
+		}
 	};
 
 	return (
@@ -387,10 +483,10 @@ export default function ListUser() {
 							<Input
 								placeholder="Find users by..."
 								onChange={e => handleChange(e)}
-								onKeyDown={handleEnterSearch}
+								onKeyDown={handleEnterSearch} value={filterSearch}
 							/>
-							<Button type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
-								<div className="flex items-center" onClick={handleClickSearch}>
+							<Button disabled={isSpin || filterSearch === ''} type="primary" style={{ backgroundColor: '#13ae81', border: '#13ae81' }}>
+								<div className="flex items-center" onClick={() => handleClickSearch()}>
 									<i className="bx bx-search text-base mr-1"></i>
 									<span>Search</span>
 								</div>
@@ -437,6 +533,7 @@ export default function ListUser() {
 									current={Number(pageValue)}
 									showSizeChanger
 									defaultCurrent={1}
+									pageSize={numberLimit}
 									total={blockDataUser?.lengthUser}
 									onChange={onShowSizeChange}
 									locale={{ items_per_page: ' Users per page' }}
@@ -446,7 +543,12 @@ export default function ListUser() {
 					)}
 				</div>
 			</div>
-
+			{/* <PopupStatusUser
+				ModalVisibleAdd={isModalVisibleAdd}
+				handleCancelAdd={handleCancelAdd}
+				handleOKAdd={handleOKAdd}
+				statusActiveUser={statusActiveUser}
+			/> */}
 			<PopupGroupUsers
 				currentUser={currentUser}
 				handleOk={handleOk}
@@ -465,6 +567,7 @@ export default function ListUser() {
 				currentUser={currentUser}
 				setStatusChangeEmail={setStatusChangeEmail}
 			/>
+			<PopupChangeStatusUser isModalOpen={isModalOpenActiveUser} handleCancel={handleCancel} body={bodyChangeUser} handleOK={handleChangeStatusUser} statusActiveUser={statusActiveUser} />
 		</>
 	);
 }
